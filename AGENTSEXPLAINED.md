@@ -42,12 +42,11 @@ and optionally a list of subagents it can delegate to. Each agent is a single
 name: 05-Bicep
 description: Generates Bicep templates using Azure Verified Modules
 model: "Claude Opus 4.6"
-user-invokable: true            # appears in the agent picker in VS Code
+user-invokable: true # appears in the agent picker in VS Code
 argument-hint: Describe the infrastructure to implement in Bicep
-agents: []                      # subagent names this agent can delegate to
+agents: [] # subagent names this agent can delegate to
 tools: [execute/runInTerminal, edit/createFile, search, ...]
 ---
-
 # Bicep Agent
 
 Instructions written in Markdown. This is the agent's system prompt.
@@ -56,14 +55,14 @@ Everything below the front matter is injected as context when the agent runs.
 
 **Key front matter fields:**
 
-| Field | Purpose |
-| ----- | ------- |
-| `name` | Identifier used for subagent delegation and the VS Code agent picker |
-| `description` | One-line summary shown in the UI |
-| `model` | Which LLM backs this agent (`Claude Opus 4.6`, `GPT-5.3-Codex`, etc.) |
-| `user-invokable` | If `true`, the user can select and talk to this agent directly |
-| `agents` | Array of agent `name` values this agent can call via `runSubagent` |
-| `tools` | Array of tool identifiers this agent has access to |
+| Field            | Purpose                                                               |
+| ---------------- | --------------------------------------------------------------------- |
+| `name`           | Identifier used for subagent delegation and the VS Code agent picker  |
+| `description`    | One-line summary shown in the UI                                      |
+| `model`          | Which LLM backs this agent (`Claude Opus 4.6`, `GPT-5.3-Codex`, etc.) |
+| `user-invokable` | If `true`, the user can select and talk to this agent directly        |
+| `agents`         | Array of agent `name` values this agent can call via `runSubagent`    |
+| `tools`          | Array of tool identifiers this agent has access to                    |
 
 **Body (Markdown)**: This is the agent's full system prompt. It typically contains:
 
@@ -118,12 +117,12 @@ This is a pull model — skills are not auto-injected; agents must request them.
 
 **When to use a skill vs. an instruction:**
 
-| Criterion | Skill | Instruction |
-| --------- | ----- | ----------- |
-| Activation | Agent reads it explicitly | Auto-injected by file glob |
-| Scope | Domain knowledge, patterns, tables | Coding standards for a file type |
+| Criterion   | Skill                              | Instruction                             |
+| ----------- | ---------------------------------- | --------------------------------------- |
+| Activation  | Agent reads it explicitly          | Auto-injected by file glob              |
+| Scope       | Domain knowledge, patterns, tables | Coding standards for a file type        |
 | Granularity | Broad (can span hundreds of lines) | Focused (rules for one language/format) |
-| Audience | One or more specific agents | Any agent editing matching files |
+| Audience    | One or more specific agents        | Any agent editing matching files        |
 
 ### Instructions
 
@@ -152,24 +151,24 @@ applyTo: "**/*.bicep"
 paths. When an agent writes to a `.bicep` file, VS Code automatically includes
 the Bicep instruction in the context. Examples:
 
-| `applyTo` | Effect |
-| --------- | ------ |
+| `applyTo`    | Effect                                               |
+| ------------ | ---------------------------------------------------- |
 | `**/*.bicep` | Active whenever a `.bicep` file is created or edited |
-| `**/*.md` | Active for all Markdown files |
-| `**/*.py` | Active for all Python files |
-| `**` | Active for every file (repo-wide rule) |
+| `**/*.md`    | Active for all Markdown files                        |
+| `**/*.py`    | Active for all Python files                          |
+| `**`         | Active for every file (repo-wide rule)               |
 
 **Instructions in this repo:**
 
-| File | `applyTo` | Purpose |
-| ---- | --------- | ------- |
-| `bicep-code-best-practices.instructions.md` | `**/*.bicep` | AVM-first, naming, security defaults, deployer RBAC |
-| `markdown.instructions.md` | `**/*.md` | Line length, heading hierarchy, callout styles |
-| `python.instructions.md` | `**/*.py` | Ruff formatting, type hints, import ordering |
-| `powershell.instructions.md` | `**/*.ps1, **/*.psm1` | Comment-based help, approved verbs |
-| `code-commenting.instructions.md` | `**` | Minimal-comment philosophy across all languages |
-| `agent-research-first.instructions.md` | `**/*.agent.md, ...` | Enforces research-before-implementation |
-| `azure-artifacts.instructions.md` | `**/scenario/**/*.md` | Template compliance for generated artifacts |
+| File                                        | `applyTo`             | Purpose                                             |
+| ------------------------------------------- | --------------------- | --------------------------------------------------- |
+| `bicep-code-best-practices.instructions.md` | `**/*.bicep`          | AVM-first, naming, security defaults, deployer RBAC |
+| `markdown.instructions.md`                  | `**/*.md`             | Line length, heading hierarchy, callout styles      |
+| `python.instructions.md`                    | `**/*.py`             | Ruff formatting, type hints, import ordering        |
+| `powershell.instructions.md`                | `**/*.ps1, **/*.psm1` | Comment-based help, approved verbs                  |
+| `code-commenting.instructions.md`           | `**`                  | Minimal-comment philosophy across all languages     |
+| `agent-research-first.instructions.md`      | `**/*.agent.md, ...`  | Enforces research-before-implementation             |
+| `azure-artifacts.instructions.md`           | `**/scenario/**/*.md` | Template compliance for generated artifacts         |
 
 ### Prompts (User Messages)
 
@@ -274,16 +273,16 @@ The agent system requires specific VS Code settings in `.vscode/settings.json`:
 
   // Where to find agent files
   "chat.agentFilesLocations": {
-    ".github/agents": true
+    ".github/agents": true,
   },
 
   // Where to find skill files
   "chat.agentSkillsLocations": {
-    ".github/skills": true
+    ".github/skills": true,
   },
 
   // Enable skill loading
-  "chat.useAgentSkills": true
+  "chat.useAgentSkills": true,
 }
 ```
 
@@ -359,11 +358,11 @@ state is the file system — specifically the `scenario/{project}/` folder.
 
 ## Quick Reference: What Goes Where
 
-| I want to... | Put it in... | File type | Activation |
-| ------------- | ------------ | --------- | ---------- |
-| Define a new workflow step | `.github/agents/` | `.agent.md` | User selects or parent delegates |
-| Store reusable domain knowledge | `.github/skills/` | `SKILL.md` | Agent reads explicitly |
-| Enforce coding standards for a file type | `.github/instructions/` | `.instructions.md` | Auto-injected by `applyTo` glob |
-| Define artifact structure | `.github/skills/azure-artifacts/templates/` | `.template.md` | Agent reads explicitly |
-| Configure agent discovery | `.vscode/settings.json` | JSON | Always active |
-| Provide tool access (MCP servers, etc.) | `.vscode/mcp.json` | JSON | Always active |
+| I want to...                             | Put it in...                                | File type          | Activation                       |
+| ---------------------------------------- | ------------------------------------------- | ------------------ | -------------------------------- |
+| Define a new workflow step               | `.github/agents/`                           | `.agent.md`        | User selects or parent delegates |
+| Store reusable domain knowledge          | `.github/skills/`                           | `SKILL.md`         | Agent reads explicitly           |
+| Enforce coding standards for a file type | `.github/instructions/`                     | `.instructions.md` | Auto-injected by `applyTo` glob  |
+| Define artifact structure                | `.github/skills/azure-artifacts/templates/` | `.template.md`     | Agent reads explicitly           |
+| Configure agent discovery                | `.vscode/settings.json`                     | JSON               | Always active                    |
+| Provide tool access (MCP servers, etc.)  | `.vscode/mcp.json`                          | JSON               | Always active                    |
