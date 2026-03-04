@@ -170,6 +170,13 @@ cd scenario/{project-name}
 azd down
 ```
 
+## Understanding the Agent Architecture
+
+New to GitHub Copilot custom agents? See
+[AGENTSEXPLAINED.md](AGENTSEXPLAINED.md) for a technical deep-dive into how
+agents, skills, instructions, and prompts work together — including how to
+add your own agents, skills, and coding standards to the workflow.
+
 ## Contributing
 
 1. **Agents** live in `.github/agents/` — each file defines one workflow step
