@@ -1,0 +1,495 @@
+---
+name: azd-demo-builder
+description: "Consolidated skill for Azure demo scenario generation: defaults, AVM-first Bicep, architecture diagrams, artifact templates, and demo guide patterns."
+compatibility: Works with Claude Code, GitHub Copilot, VS Code, and any Agent Skills compatible tool.
+license: MIT
+metadata:
+  author: petender
+  version: "2.0"
+  category: azure-infrastructure
+---
+
+# Azure Demo Builder — Consolidated Skill
+
+Single reference for all agents. Covers Azure defaults, Bicep patterns,
+architecture diagrams, artifact templates, and demo guide generation.
+
+---
+
+## 1. Azure Defaults
+
+### Default Regions
+
+| Service             | Default Region  | Reason                              |
+| ------------------- | --------------- | ----------------------------------- |
+| **All resources**   | `eastus2`       | Primary Azure Region                |
+| **Static Web Apps** | `westeurope`    | Not available in swedencentral      |
+| **Azure OpenAI**    | `swedencentral` | Limited availability — verify first |
+| **Fallback**        | `westus3`       | Secondary Azure Region (if needed)  |
+
+### Required Tags
+
+| Tag           | Required | Example Values       |
+| ------------- | -------- | -------------------- |
+| `Environment` | Yes      | AZD Environment Name |
+| `ManagedBy`   | Yes      | `Bicep`              |
+| `Project`     | Yes      | Project identifier   |
+
+```bicep
+tags: {
+  Environment: azd environment name
+  ManagedBy: 'Bicep'
+  Project: projectName
+  SecurityControl: 'Ignore'
+}
+```
+
+### Unique Suffix Pattern
+
+Generate ONCE in `main.bicep`, pass to ALL modules:
+
+```bicep
+var uniqueSuffix = uniqueString(resourceGroup().id)
+```
+
+### Security Baseline
+
+| Setting                    | Value               | Applies To                        |
+| -------------------------- | ------------------- | --------------------------------- |
+| `supportsHttpsTrafficOnly` | `true`              | Storage accounts                  |
+| `minimumTlsVersion`        | `'TLS1_2'`          | All services                      |
+| `allowBlobPublicAccess`    | `false`             | Storage accounts                  |
+| `publicNetworkAccess`      | `'Disabled'` (prod) | Data services                     |
+| Authentication             | Managed Identity    | Prefer over keys/strings          |
+| SQL Auth                   | Azure AD-only       | `azureADOnlyAuthentication: true` |
+
+### Naming Conventions
+
+| Resource         | Abbreviation | Name Pattern                | Max Length |
+| ---------------- | ------------ | --------------------------- | ---------- |
+| Resource Group   | `rg`         | `rg-{project}-{env}`        | 90         |
+| Virtual Network  | `vnet`       | `vnet-{project}-{env}`      | 64         |
+| Subnet           | `snet`       | `snet-{purpose}-{env}`      | 80         |
+| NSG              | `nsg`        | `nsg-{purpose}-{env}`       | 80         |
+| Key Vault        | `kv`         | `kv-{short}-{env}-{suffix}` | **24**     |
+| Storage Account  | `st`         | `st{short}{env}{suffix}`    | **24**     |
+| App Service Plan | `asp`        | `asp-{project}-{env}`       | 40         |
+| App Service      | `app`        | `app-{project}-{env}`       | 60         |
+| SQL Server       | `sql`        | `sql-{project}-{env}`       | 63         |
+| SQL Database     | `sqldb`      | `sqldb-{project}-{env}`     | 128        |
+| Static Web App   | `stapp`      | `stapp-{project}-{env}`     | 40         |
+| Log Analytics    | `log`        | `log-{project}-{env}`       | 63         |
+| App Insights     | `appi`       | `appi-{project}-{env}`      | 255        |
+| Container App    | `ca`         | `ca-{project}-{env}`        | 32         |
+| Container Env    | `cae`        | `cae-{project}-{env}`       | 60         |
+| Cosmos DB        | `cosmos`     | `cosmos-{project}-{env}`    | 44         |
+| Service Bus      | `sb`         | `sb-{project}-{env}`        | 50         |
+
+**Length-constrained resources** (Key Vault, Storage — 24 char limit):
+
+```bicep
+var kvName = 'kv-${take(projectName, 8)}-${take(environment, 3)}-${take(uniqueSuffix, 6)}'
+var stName = 'st${take(replace(projectName, '-', ''), 8)}${take(environment, 3)}${take(uniqueSuffix, 6)}'
+```
+
+**Rules**: lowercase with hyphens, include `uniqueSuffix` in globally unique names,
+use `take()` to truncate, no hyphens in Storage Account names.
+
+---
+
+## 2. Azure Verified Modules (AVM)
+
+### AVM-First Policy
+
+1. **ALWAYS** check AVM availability first via `mcp_bicep_list_avm_metadata`
+2. Use AVM module defaults for SKUs when available
+3. **NEVER** write raw Bicep for a resource that has an AVM module
+
+### Common AVM Modules
+
+| Resource           | Module Path                                        | Min Version |
+| ------------------ | -------------------------------------------------- | ----------- |
+| Key Vault          | `br/public:avm/res/key-vault/vault`                | `0.11.0`    |
+| Virtual Network    | `br/public:avm/res/network/virtual-network`        | `0.5.0`     |
+| Storage Account    | `br/public:avm/res/storage/storage-account`        | `0.14.0`    |
+| App Service Plan   | `br/public:avm/res/web/serverfarm`                 | `0.4.0`     |
+| App Service        | `br/public:avm/res/web/site`                       | `0.12.0`    |
+| SQL Server         | `br/public:avm/res/sql/server`                     | `0.10.0`    |
+| Log Analytics      | `br/public:avm/res/operational-insights/workspace` | `0.9.0`     |
+| App Insights       | `br/public:avm/res/insights/component`             | `0.4.0`     |
+| NSG                | `br/public:avm/res/network/network-security-group` | `0.5.0`     |
+| Static Web App     | `br/public:avm/res/web/static-site`                | `0.4.0`     |
+| Container App      | `br/public:avm/res/app/container-app`              | `0.11.0`    |
+| Container Env      | `br/public:avm/res/app/managed-environment`        | `0.8.0`     |
+| Cosmos DB          | `br/public:avm/res/document-db/database-account`   | `0.10.0`    |
+| Front Door         | `br/public:avm/res/cdn/profile`                    | `0.7.0`     |
+| Service Bus        | `br/public:avm/res/service-bus/namespace`          | `0.10.0`    |
+| Container Registry | `br/public:avm/res/container-registry/registry`    | `0.6.0`     |
+
+### AVM Usage Pattern
+
+```bicep
+module keyVault 'br/public:avm/res/key-vault/vault:0.11.0' = {
+  name: '${kvName}-deploy'
+  params: {
+    name: kvName
+    location: location
+    tags: tags
+    enableRbacAuthorization: true
+    enablePurgeProtection: true
+  }
+}
+```
+
+### AVM Known Pitfalls
+
+| Module                 | Issue                                       | Fix                                          |
+| ---------------------- | ------------------------------------------- | -------------------------------------------- |
+| Log Analytics          | `dailyQuotaGb` is `int`, not `string`       | Use `dailyQuotaGb: 5`                        |
+| Container Env          | `appLogsConfiguration` deprecated           | Use `logsConfiguration` with destination obj |
+| Container App          | `scaleSettings` is object, not array        | Check AVM schema for exact shape             |
+| SQL Server             | `sku` is typed object `{name,tier,cap}`     | Pass full SKU object                         |
+| App Service            | Instrumentation key deprecated              | Use `APPLICATIONINSIGHTS_CONNECTION_STRING`  |
+| Key Vault              | `softDeleteRetentionInDays` is immutable    | Set correctly on first deploy (default: 90)  |
+| Static Web App         | Free SKU unreliable via ARM in some regions | Use `Standard` for reliable Bicep deployment |
+| Static Web Apps region | Only 5 regions available                    | Use `westeurope` for EU                      |
+
+---
+
+## 3. Bicep Patterns
+
+### Private Endpoint Wiring
+
+Three-resource pattern: private endpoint → DNS zone group → DNS zone link.
+
+```bicep
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
+  name: 'pe-${serviceName}-${uniqueSuffix}'
+  location: location
+  tags: tags
+  properties: {
+    subnet: { id: subnetId }
+    privateLinkServiceConnections: [
+      {
+        name: 'plsc-${serviceName}'
+        properties: {
+          privateLinkServiceId: targetResourceId
+          groupIds: [groupId]
+        }
+      }
+    ]
+  }
+}
+
+resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
+  parent: privateEndpoint
+  name: 'default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config'
+        properties: { privateDnsZoneId: privateDnsZoneId }
+      }
+    ]
+  }
+}
+```
+
+**Group IDs by service type:**
+
+| Service       | Group ID    | DNS Zone                             |
+| ------------- | ----------- | ------------------------------------ |
+| Storage Blob  | `blob`      | `privatelink.blob.core.windows.net`  |
+| Storage Table | `table`     | `privatelink.table.core.windows.net` |
+| Key Vault     | `vault`     | `privatelink.vaultcore.azure.net`    |
+| SQL Server    | `sqlServer` | `privatelink.database.windows.net`   |
+| Cosmos DB     | `Sql`       | `privatelink.documents.azure.com`    |
+| App Service   | `sites`     | `privatelink.azurewebsites.net`      |
+| Event Hub     | `namespace` | `privatelink.servicebus.windows.net` |
+| Container Reg | `registry`  | `privatelink.azurecr.io`             |
+
+### Diagnostic Settings
+
+Every resource must send logs and metrics to a workspace:
+
+```bicep
+param logAnalyticsWorkspaceName string
+
+resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: logAnalyticsWorkspaceName
+}
+
+resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'diag-${parentResourceName}'
+  scope: parentResource
+  properties: {
+    workspaceId: workspace.id
+    logs: [{ categoryGroup: 'allLogs', enabled: true }]
+    metrics: [{ category: 'AllMetrics', enabled: true }]
+  }
+}
+```
+
+### Conditional Deployment
+
+```bicep
+@description('Deploy a Redis cache for session state')
+param deployRedis bool = false
+
+module redis 'modules/redis.bicep' = if (deployRedis) {
+  name: 'redis-cache'
+  params: {
+    name: 'redis-${projectName}-${environment}-${uniqueSuffix}'
+    location: location
+    tags: tags
+  }
+}
+
+output redisHostName string = deployRedis ? redis.outputs.hostName : ''
+```
+
+### Module Composition Contract
+
+Every module accepts `name`, `location`, `tags`, `logAnalyticsWorkspaceName`.
+Every module outputs `resourceId`, `resourceName`, `principalId`.
+
+```bicep
+// modules/storage.bicep
+@description('Storage account name (max 24 chars)')
+param name string
+@description('Azure region')
+param location string
+@description('Resource tags')
+param tags object
+@description('Log Analytics workspace name for diagnostics')
+param logAnalyticsWorkspaceName string
+
+// ... resource definition ...
+
+@description('Resource ID of the storage account')
+output resourceId string = storageAccount.id
+@description('Name of the storage account')
+output resourceName string = storageAccount.name
+@description('Principal ID of the managed identity (empty if none)')
+output principalId string = storageAccount.identity.?principalId ?? ''
+```
+
+### Managed Identity Binding
+
+```bicep
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault.id, appService.id, keyVaultSecretsUserRoleId)
+  scope: keyVault
+  properties: {
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      keyVaultSecretsUserRoleId
+    )
+    principalId: appService.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+```
+
+**Common role definition IDs:**
+
+| Role                      | ID                                     |
+| ------------------------- | -------------------------------------- |
+| Key Vault Secrets User    | `4633458b-17de-408a-b874-0445c86b69e6` |
+| Storage Blob Data Reader  | `2a2b9908-6ea1-4ae2-8e65-a410df84e7d1` |
+| Storage Blob Data Contrib | `ba92f5b4-2d11-453d-a403-e96b0029c9fe` |
+| Cosmos DB Account Reader  | `fbdf93bf-df7d-467e-a4d2-9458aa1360c8` |
+| SQL DB Contributor        | `9b7fa17d-e63e-47b0-bb0a-15c516ac86ec` |
+
+## 4. Architecture Diagrams
+
+### Output Naming
+
+```text
+scenario/{project}/
+├── 03-des-diagram.py          # Python source (version controlled)
+├── 03-des-diagram.png         # PNG output
+```
+
+### Execution
+
+Save `.py` to `scenario/{project}/`, then execute:
+
+```bash
+python3 scenario/{project}/03-des-diagram.py
+```
+
+### Diagram Contract
+
+- Cluster vars: `clu_<scope>_<slug>` (scope: `sub|rg|net|tier|zone|ext`)
+- Node vars: `n_<domain>_<service>_<role>` (domain: `edge|web|app|data|id|sec|ops|int`)
+- Flow taxonomy: `auth|request|response|read|write|event|replicate|secret|telemetry|admin`
+- Default `direction="LR"` unless justified
+- Short labels (2-4 words), max 3 edge styles
+
+### Prerequisites
+
+```bash
+pip install diagrams matplotlib pillow
+# Graphviz required: choco install graphviz (Windows)
+```
+
+### Quick Start
+
+```python
+from diagrams import Diagram, Cluster, Edge
+from diagrams.azure.compute import AppServices
+from diagrams.azure.database import CosmosDb
+from diagrams.azure.network import ApplicationGateway
+from diagrams.azure.security import KeyVaults
+from diagrams.azure.identity import ActiveDirectory
+
+graph_attr = {
+    "bgcolor": "white",
+    "pad": "0.8",
+    "nodesep": "0.9",
+    "ranksep": "0.9",
+    "splines": "spline",
+    "fontname": "Arial Bold",
+    "fontsize": "16",
+    "dpi": "150",
+}
+
+node_attr = {
+    "fontname": "Arial Bold",
+    "fontsize": "11",
+    "labelloc": "t",
+}
+
+cluster_style = {"margin": "30", "fontname": "Arial Bold", "fontsize": "14"}
+
+with Diagram("Architecture",
+             show=False,
+             direction="LR",
+             graph_attr=graph_attr,
+             node_attr=node_attr):
+
+    with Cluster("Resource Group", graph_attr=cluster_style):
+        app = AppServices("Web App")
+        db = CosmosDb("Cosmos DB")
+
+    app >> Edge(label="Managed Identity") >> db
+```
+
+### Azure Service Categories
+
+| Category        | Import                       | Key Services                                           |
+| --------------- | ---------------------------- | ------------------------------------------------------ |
+| **Compute**     | `diagrams.azure.compute`     | VM, AKS, Functions, App Service, Container Apps        |
+| **Networking**  | `diagrams.azure.network`     | VNet, Load Balancer, App Gateway, Front Door, Firewall |
+| **Database**    | `diagrams.azure.database`    | SQL, Cosmos DB, PostgreSQL, MySQL, Redis               |
+| **Storage**     | `diagrams.azure.storage`     | Blob, Files, Data Lake, Queue, Table                   |
+| **Integration** | `diagrams.azure.integration` | Logic Apps, Service Bus, Event Grid, APIM              |
+| **Security**    | `diagrams.azure.security`    | Key Vault, Sentinel, Defender                          |
+| **Identity**    | `diagrams.azure.identity`    | Entra ID, Managed Identity                             |
+| **Monitor**     | `diagrams.azure.monitor`     | Monitor, App Insights, Log Analytics                   |
+
+### Connection Syntax
+
+```python
+a >> b                              # Simple arrow
+a >> b >> c                         # Chain
+a >> [b, c, d]                      # Fan-out
+[a, b] >> c                         # Fan-in
+a >> Edge(label="HTTPS") >> b       # Labeled
+a >> Edge(style="dashed") >> b      # Dashed (config/secrets)
+```
+
+### Clusters
+
+Map Azure hierarchy: Subscription -> Resource Group -> VNet -> Subnet.
+Include CIDR blocks in VNet/Subnet labels.
+
+```python
+with Cluster("rg-app-prod"):
+    with Cluster("vnet-spoke (10.1.0.0/16)"):
+        with Cluster("snet-app (10.1.1.0/24)"):
+            app = AppServices("Web App")
+```
+
+### Guardrails
+
+- **DO**: Save to `scenario/{project}/` with `projectname-*` prefix
+- **DO**: Execute Python to generate PNG, verify it exists
+- **DO**: Use actual resource names from IaC, not placeholders
+- **DO**: Use `labelloc='t'` in `node_attr` for clean labels
+- **DON'T**: Skip PNG generation
+- **DON'T**: Use invalid or made-up diagram node types
+- **DON'T**: Use Mermaid for architecture diagrams (always Python `diagrams`)
+
+---
+
+## 5. Artifact Templates
+
+### Generation Rules
+
+| Rule                | Requirement                                             |
+| ------------------- | ------------------------------------------------------- |
+| **Template H2s**    | Use H2 text from this skill verbatim, in listed order   |
+| **No omissions**    | Every listed H2 must appear in output                   |
+| **Anchor rule**     | Extra sections allowed only AFTER last required H2      |
+| **Attribution**     | Include: `> Generated by {agent} agent \| {YYYY-MM-DD}` |
+| **Output folder**   | All artifacts to `scenario/{project}/`                  |
+| **No placeholders** | No "TBD", "Insert here", or "TODO" in final output      |
+
+### Project Scenario README
+
+Every project in `scenario/{project}/` **MUST** have a `README.md`.
+Template: `.github/skills/azure-artifacts/templates/PROJECT-README.template.md`
+
+After saving step artifacts, update README: mark step complete, add artifact files,
+update date and progress percentage (each step ≈ 14%).
+
+### Documentation Styling
+
+**Callout styles:**
+
+```markdown
+> [!NOTE] — Informational
+> [!TIP] — Best practice
+> [!IMPORTANT] — Critical configuration
+> [!WARNING] — Security/reliability risk
+> [!CAUTION] — Data loss / breaking change
+```
+
+**Status emoji:**
+
+| Purpose          | Emoji |
+| ---------------- | ----- |
+| Success/Complete | ✅    |
+| Warning          | ⚠️    |
+| Error/Critical   | ❌    |
+| Info/Tip         | 💡    |
+| Security         | 🔐    |
+| Pending          | ⏳    |
+
+**Category icons:**
+
+| Category   | Icon |
+| ---------- | ---- |
+| Compute    | 💻   |
+| Data       | 💾   |
+| Networking | 🌐   |
+| Security   | 🔐   |
+| Monitoring | 📊   |
+| Identity   | 👤   |
+| Storage    | 📦   |
+
+---
+
+## 6. Demo Guide Patterns
+
+{context will be added later}
+
+### Quality Standards
+
+- Every CLI command uses actual project resource names (no `{placeholder}` in final output)
+- Time estimates add up to ±2 min of audience format total
+- Contingency playbook covers top 3 most likely failure scenarios
+- Pre-demo checklist validates all resources the demo touches
+- Talking points match the selected audience persona tone
