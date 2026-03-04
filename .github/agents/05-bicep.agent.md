@@ -104,6 +104,9 @@ These skills are your single source of truth. Do NOT use hardcoded values.
 - ✅ Apply security baseline (TLS 1.2, HTTPS-only, no public blob access, managed identity)
 - ✅ Follow CAF naming conventions (from azure-defaults skill)
 - ✅ Use `take()` for length-constrained resources (Key Vault ≤24, Storage ≤24)
+- ✅ Accept `principalId` parameter in `main.bicep` (azd auto-populates from signed-in user via `AZURE_PRINCIPAL_ID`)
+- ✅ Assign deployer data plane RBAC roles on every RBAC-enabled resource (Key Vault, Storage, Cosmos DB, Service Bus, etc.)
+- ✅ Use `principalType: 'User'` for the deployer role assignments (not `ServicePrincipal`)
 - ✅ Generate or update `scenario/{project}/azure.yaml` with `infra.path: ./infra` for AZD compatibility
 - ✅ Generate `.bicepparam` parameter file for each environment
 - ✅ If plan specifies phased deployment, add `phase` parameter to
@@ -119,6 +122,7 @@ These skills are your single source of truth. Do NOT use hardcoded values.
 
 - ❌ Skip governance discovery — this is a HARD GATE, not optional
 - ❌ Start coding before the implementation plan is generated
+- ❌ Deploy RBAC-enabled resources without assigning the deployer data plane access
 - ❌ Write raw Bicep for resources with AVM modules available
 - ❌ Hardcode unique strings — always derive from `uniqueString(resourceGroup().id)`
 - ❌ Use deprecated settings (see AVM Known Pitfalls in azure-defaults skill)
@@ -266,6 +270,9 @@ Build templates in dependency order.
 
 - Diagnostic settings on all resources
 - Role assignments (managed identity → Key Vault, Storage, etc.)
+- **Deployer RBAC**: Assign data plane roles to the `principalId` parameter (the deploying user) on every
+  RBAC-enabled resource. Use `principalType: 'User'`. See the "Deployer Data Plane Access" pattern
+  in `.github/skills/SKILL.md` for the role mapping table and Bicep pattern.
 
 After each round: run `bicep build` to catch errors early.
 
@@ -351,6 +358,7 @@ Include attribution header from the template file (do not hardcode).
 - [ ] AVM modules used for all resources with AVM availability
 - [ ] `uniqueSuffix` generated once in `main.bicep`, passed to all modules
 - [ ] Security baseline applied (TLS 1.2, HTTPS, managed identity)
+- [ ] Deployer (`principalId`) assigned data plane roles on all RBAC-enabled resources
 - [ ] Length constraints respected (Key Vault ≤24, Storage ≤24)
 - [ ] No deprecated parameters used (checked against AVM pitfalls)
 - [ ] `bicep lint` and `bicep build` pass with no errors

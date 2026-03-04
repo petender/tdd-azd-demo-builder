@@ -73,6 +73,56 @@ minimalTlsVersion: '1.2'
 publicNetworkAccess: 'Disabled'
 ```
 
+## Deployer Data Plane Access (MANDATORY)
+
+> [!IMPORTANT]
+> When a resource uses RBAC for data plane authorization, the deploying user
+> has **no data plane access by default**. You MUST assign explicit role assignments.
+
+Every `main.bicep` must accept the deployer's identity and assign data plane roles:
+
+```bicep
+@description('Principal ID of the deployer (azd auto-provides via AZURE_PRINCIPAL_ID)')
+param principalId string
+```
+
+In `main.bicepparam`:
+
+```bicep
+param principalId = readEnvironmentVariable('AZURE_PRINCIPAL_ID', '')
+```
+
+For each RBAC-enabled resource, add a deployer role assignment in the
+role assignment module (or inline). Use `principalType: 'User'` and guard
+with `if (!empty(principalId))`:
+
+```bicep
+var keyVaultAdminRoleId = '00482a5a-887f-4fb3-b363-3b7fe8e74483'
+
+resource deployerKvRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(principalId)) {
+  name: guid(keyVault.id, principalId, keyVaultAdminRoleId)
+  scope: keyVault
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', keyVaultAdminRoleId)
+    principalId: principalId
+    principalType: 'User'
+  }
+}
+```
+
+**Resources that require deployer data plane roles:**
+
+| Resource          | Role                          | Why                                       |
+| ----------------- | ----------------------------- | ----------------------------------------- |
+| Key Vault (RBAC)  | Key Vault Administrator       | Read/write secrets, keys, certificates    |
+| Storage (no SAS)  | Storage Blob Data Contributor | Read/write blobs when shared key disabled |
+| Cosmos DB         | Cosmos DB Data Contributor    | Read/write documents                      |
+| Service Bus       | Service Bus Data Owner        | Send/receive messages                     |
+| Event Hubs        | Event Hubs Data Owner         | Send/receive events                       |
+| App Configuration | App Config Data Owner         | Read/write configuration values           |
+
+See `.github/skills/SKILL.md` → "Deployer Data Plane Access" for full role ID table.
+
 ## Diagnostic Settings Pattern
 
 ```bicep

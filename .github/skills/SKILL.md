@@ -301,6 +301,73 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 | Cosmos DB Account Reader  | `fbdf93bf-df7d-467e-a4d2-9458aa1360c8` |
 | SQL DB Contributor        | `9b7fa17d-e63e-47b0-bb0a-15c516ac86ec` |
 
+### Deployer Data Plane Access (MANDATORY)
+
+When resources use RBAC for data plane authorization (e.g., Key Vault with
+`enableRbacAuthorization: true`, Storage with `allowSharedKeyAccess: false`),
+the deploying user loses data plane access unless explicit role assignments are created.
+
+**Rule**: Every RBAC-enabled resource MUST include a role assignment granting the
+deploying user (the person running `azd up`) appropriate data plane access.
+
+**Step 1 — Accept the deployer's principal ID in `main.bicep`:**
+
+```bicep
+@description('Principal ID of the deploying user. Azure Developer CLI populates this automatically.')
+param principalId string
+```
+
+**Step 2 — Wire `AZURE_PRINCIPAL_ID` in `main.bicepparam`:**
+
+```bicep
+param principalId = readEnvironmentVariable('AZURE_PRINCIPAL_ID', '')
+```
+
+> [!NOTE]
+> `azd` automatically sets the `AZURE_PRINCIPAL_ID` environment variable
+> to the signed-in user's object ID. No manual configuration is needed.
+
+**Step 3 — Create role assignments for the deployer on each RBAC-enabled resource:**
+
+```bicep
+// Deployer data plane access — Key Vault Administrator
+resource deployerKvRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(principalId)) {
+  name: guid(keyVault.id, principalId, keyVaultAdminRoleId)
+  scope: keyVault
+  properties: {
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      keyVaultAdminRoleId
+    )
+    principalId: principalId
+    principalType: 'User'
+  }
+}
+```
+
+> [!IMPORTANT]
+> Use `principalType: 'User'` for the deployer (not `ServicePrincipal`).
+> Wrap in `if (!empty(principalId))` to avoid failures in CI/CD pipelines
+> where the parameter may be empty.
+
+**Deployer data plane role mapping — assign one per RBAC-enabled resource:**
+
+| Resource                | Recommended Role               | Role Definition ID                     |
+| ----------------------- | ------------------------------ | -------------------------------------- |
+| Key Vault               | Key Vault Administrator        | `00482a5a-887f-4fb3-b363-3b7fe8e74483` |
+| Storage Account (Blob)  | Storage Blob Data Contributor  | `ba92f5b4-2d11-453d-a403-e96b0029c9fe` |
+| Storage Account (Table) | Storage Table Data Contributor | `0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3` |
+| Cosmos DB (NoSQL)       | Cosmos DB Data Contributor     | Use custom Cosmos DB data plane role   |
+| Service Bus             | Service Bus Data Owner         | `090c5cfd-751d-490a-894a-3ce6f1109419` |
+| Event Hubs              | Event Hubs Data Owner          | `f526a384-b230-433a-b45c-95f59c4a2dec` |
+| Azure AI Search         | Search Index Data Contributor  | `8ebe5a00-799e-43f5-93ac-243d3dce84a7` |
+| App Configuration       | App Configuration Data Owner   | `5ae67dd6-50cb-40e7-96ff-dc2bfa4b606b` |
+
+> [!TIP]
+> For demo/PoC scenarios, prefer the broader admin/owner data plane roles
+> (e.g., `Key Vault Administrator` over `Key Vault Secrets User`) so the
+> deployer can fully manage the resource during demonstrations.
+
 ## 4. Architecture Diagrams
 
 ### Output Naming
