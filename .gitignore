@@ -91,3 +91,6 @@ crash.*.log
 
 # Demo Scenario folder
 scenario/
+
+# Playwright screenshot artifacts
+.playwright-mcp/
