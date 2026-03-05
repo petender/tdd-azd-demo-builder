@@ -16,6 +16,18 @@ via Bicep templates and the Azure Developer CLI (azd). Covers the full
 deployment lifecycle: pre-flight checks, execution strategies, post-deployment
 validation, rollback, and cleanup.
 
+> [!CAUTION]
+> **MANDATORY DEPLOYMENT POLICY**
+>
+> 1. **Always attempt deployment**: The Deploy agent MUST always attempt `azd up`.
+>    Tooling blockers (missing CLI, extension errors, auth issues) must be resolved
+>    or escalated to the user — never used as a reason to autonomously skip deployment.
+> 2. **User decides on failure**: If deployment fails for any reason, present the
+>    full error to the user and ask for their decision. Never autonomously generate
+>    a "dry-run only" or "blocked" summary and move on.
+> 3. **Escalate, don’t absorb**: If a pre-deployment gate fails and cannot be
+>    auto-fixed, ask the user. Do not silently document the failure and skip ahead.
+
 ---
 
 ## 1. Deployment Strategy Selection
@@ -240,18 +252,25 @@ Deployment failed?
 
 ## 6. Common Deployment Errors
 
-| Error                             | Cause                                      | Fix                                                      |
-| --------------------------------- | ------------------------------------------ | -------------------------------------------------------- |
-| `AuthorizationFailed`             | Insufficient RBAC permissions              | Assign `Contributor` role on the resource group          |
-| `InvalidTemplateDeployment`       | Bicep template has errors                  | Run `bicep build` to find the specific error             |
-| `QuotaExceeded`                   | SKU or region quota limit reached          | Use a different SKU or region, or request quota increase |
-| `ResourceGroupNotFound`           | RG doesn't exist for RG-scoped deploy      | Create with `az group create` first                      |
-| `DeploymentFailed` (nested)       | A module within the template failed        | Check `az deployment operation group list` for details   |
-| `NameNotAvailable`                | Globally unique name already taken         | Verify `uniqueSuffix` is applied correctly               |
-| `ResourceProviderNotRegistered`   | Service not enabled in subscription        | `az provider register --namespace {ns}`                  |
-| `MissingSubscriptionRegistration` | Same as above                              | `az provider register --namespace {ns}`                  |
-| `LinkedAuthorizationFailed`       | Cross-scope role assignment failed         | Verify managed identity exists before assigning roles    |
-| `Conflict`                        | Resource state doesn't allow the operation | Wait and retry, or delete and recreate                   |
+> [!IMPORTANT]
+> For every error in this table, the Deploy agent must **present the error
+> to the user and ask how to proceed** if auto-remediation fails.
+> Never silently skip deployment or generate a dry-run summary.
+
+| Error                             | Cause                                      | Auto-Fix Attempt                                      | If Auto-Fix Fails                    |
+| --------------------------------- | ------------------------------------------ | ----------------------------------------------------- | ------------------------------------ |
+| `AuthorizationFailed`             | Insufficient RBAC permissions              | Suggest `Contributor` role assignment                 | **Ask the user**                     |
+| `InvalidTemplateDeployment`       | Bicep template has errors                  | Run `bicep build` to surface details                  | **Ask the user**                     |
+| `QuotaExceeded`                   | SKU or region quota limit reached          | Suggest alternative SKU or region                     | **Ask the user**                     |
+| `ResourceGroupNotFound`           | RG doesn't exist for RG-scoped deploy      | Create with `az group create`                         | **Ask the user**                     |
+| `DeploymentFailed` (nested)       | A module within the template failed        | Check `az deployment operation group list`            | **Ask the user**                     |
+| `NameNotAvailable`                | Globally unique name already taken         | Verify `uniqueSuffix` is applied correctly            | **Ask the user**                     |
+| `ResourceProviderNotRegistered`   | Service not enabled in subscription        | `az provider register --namespace {ns}`               | **Ask the user**                     |
+| `MissingSubscriptionRegistration` | Same as above                              | `az provider register --namespace {ns}`               | **Ask the user**                     |
+| `LinkedAuthorizationFailed`       | Cross-scope role assignment failed         | Verify managed identity exists before assigning roles | **Ask the user**                     |
+| `Conflict`                        | Resource state doesn't allow the operation | Wait and retry                                        | **Ask the user**                     |
+| Azure CLI broken/extension error  | CLI extension permission or corruption     | Try removing extension or running repair              | **Ask the user**                     |
+| Bicep CLI missing                 | Bicep not installed                        | Try `az bicep install`                                | **Ask the user** to install manually |
 
 ### Detailed Error Investigation
 

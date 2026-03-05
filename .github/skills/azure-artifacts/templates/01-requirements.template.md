@@ -67,7 +67,6 @@ Table of recommended controls based on workload pattern and compliance requireme
 | Key Decisions        | {decisions made during requirements that affect architecture} |
 | Open Risks           | {unresolved items that architect must address}                |
 | Recommended Pattern  | {workload pattern from Functional Requirements}               |
-| Budget Envelope      | {monthly budget from Budget section}                          |
 
 ### Requirements Completeness
 
@@ -75,26 +74,6 @@ Table of recommended controls based on workload pattern and compliance requireme
 | ------------------------ | ------------ | ------- |
 | Project Overview         | ✅ / ⚠️ / ❌ | {notes} |
 | Functional Requirements  | ✅ / ⚠️ / ❌ | {notes} |
-| NFRs                     | ✅ / ⚠️ / ❌ | {notes} |
-| Compliance & Security    | ✅ / ⚠️ / ❌ | {notes} |
-| Budget                   | ✅ / ⚠️ / ❌ | {notes} |
 | Operational Requirements | ✅ / ⚠️ / ❌ | {notes} |
-
----
-
-## References
-
-> [!NOTE]
-> 📚 The following Microsoft Learn resources provide additional guidance.
-
-| Topic                      | Link                                                                                                |
-| -------------------------- | --------------------------------------------------------------------------------------------------- |
-| Well-Architected Framework | [Overview](https://learn.microsoft.com/azure/well-architected/)                                     |
-| Azure Regions              | [Products by Region](https://azure.microsoft.com/explore/global-infrastructure/products-by-region/) |
-| Compliance Offerings       | [Azure Compliance](https://learn.microsoft.com/azure/compliance/)                                   |
-
----
-
-_Requirements captured using [plan-requirements.prompt.md](../../.github/prompts/plan-requirements.prompt.md) template_
 
 ---

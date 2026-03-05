@@ -29,11 +29,12 @@ architecture diagrams, artifact templates, and demo guide generation.
 
 ### Required Tags
 
-| Tag           | Required | Example Values       |
-| ------------- | -------- | -------------------- |
-| `Environment` | Yes      | AZD Environment Name |
-| `ManagedBy`   | Yes      | `Bicep`              |
-| `Project`     | Yes      | Project identifier   |
+| Tag               | Required | Example Values       |
+| ----------------- | -------- | -------------------- |
+| `Environment`     | Yes      | AZD Environment Name |
+| `ManagedBy`       | Yes      | `Bicep`              |
+| `Project`         | Yes      | Project identifier   |
+| `SecurityControl` | Yes      | `Ignore`             |
 
 ```bicep
 tags: {
@@ -54,14 +55,14 @@ var uniqueSuffix = uniqueString(resourceGroup().id)
 
 ### Security Baseline
 
-| Setting                    | Value               | Applies To                        |
-| -------------------------- | ------------------- | --------------------------------- |
-| `supportsHttpsTrafficOnly` | `true`              | Storage accounts                  |
-| `minimumTlsVersion`        | `'TLS1_2'`          | All services                      |
-| `allowBlobPublicAccess`    | `false`             | Storage accounts                  |
-| `publicNetworkAccess`      | `'Disabled'` (prod) | Data services                     |
-| Authentication             | Managed Identity    | Prefer over keys/strings          |
-| SQL Auth                   | Azure AD-only       | `azureADOnlyAuthentication: true` |
+| Setting                    | Value            | Applies To                        |
+| -------------------------- | ---------------- | --------------------------------- |
+| `supportsHttpsTrafficOnly` | `true`           | Storage accounts                  |
+| `minimumTlsVersion`        | `'TLS1_2'`       | All services                      |
+| `allowBlobPublicAccess`    | `false`          | Storage accounts                  |
+| `publicNetworkAccess`      | `'Disabled'`     | Data services                     |
+| Authentication             | Managed Identity | Prefer over keys/strings          |
+| SQL Auth                   | Azure AD-only    | `azureADOnlyAuthentication: true` |
 
 ### Naming Conventions
 
@@ -94,6 +95,29 @@ var stName = 'st${take(replace(projectName, '-', ''), 8)}${take(environment, 3)}
 
 **Rules**: lowercase with hyphens, include `uniqueSuffix` in globally unique names,
 use `take()` to truncate, no hyphens in Storage Account names.
+
+### azure.yaml Naming Convention
+
+Every `scenario/{project}/azure.yaml` MUST follow this naming pattern:
+
+```yaml
+name: tdd-azd-{project}
+metadata:
+  template: tddazd-{project}@1.0.0
+infra:
+  provider: bicep
+  path: ./infra
+```
+
+| Field      | Pattern                  | Example (`newfoundrydemo`)    |
+| ---------- | ------------------------ | ----------------------------- |
+| `name`     | `tdd-azd-{project}`      | `tdd-azd-newfoundrydemo`      |
+| `template` | `tddazd-{project}@1.0.0` | `tddazd-newfoundrydemo@1.0.0` |
+
+> [!IMPORTANT]
+> The `name` field uses `tdd-azd-` prefix (with hyphens).
+> The `template` field uses `tddazd-` prefix (no hyphens before project name).
+> This is mandatory for all scenarios — agents generating `azure.yaml` must apply this.
 
 ---
 

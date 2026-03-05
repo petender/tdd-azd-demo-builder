@@ -1,18 +1,18 @@
 ---
 description: "Infrastructure as Code best practices for Azure Bicep templates using Azure Developer CLI (azd) with a focus on Azure Verified Modules (AVM) and policy compliance."
-applyTo: "**/*.bicep"
+applyTo: "**/*.bicep, **/azure.yaml"
 ---
 
 # Bicep Development Best Practices
 
 ## Quick Reference
 
-| Rule          | Standard                                                            |
-| ------------- | ------------------------------------------------------------------- |
-| Region        | `eastus2` (alt: `westus3`)                                          |
-| Unique suffix | `var uniqueSuffix = uniqueString(resourceGroup().id)` in main.bicep |
-| AVM first     | **MANDATORY** - Use Azure Verified Modules where available          |
-| Tags          | Environment, Project, SecurityControl on ALL resources              |
+| Rule          | Standard                                                                    |
+| ------------- | --------------------------------------------------------------------------- |
+| Region        | `eastus2` (alt: `westus3`)                                                  |
+| Unique suffix | `var uniqueSuffix = uniqueString(resourceGroup().id)` in main.bicep         |
+| AVM first     | **MANDATORY** - Use Azure Verified Modules where available                  |
+| Tags          | Environment, ManagedBy, Project, SecurityControl: 'Ignore' on ALL resources |
 
 ## Naming Conventions
 
@@ -200,7 +200,7 @@ The AZD framework requires an azure.yaml file in the root of the \scenario\{proj
 ```yaml
 name: tdd-azd-{project}
 metadata:
-  template: tddazd-{project}@1.0.0
+  template: tdd-azd-{project}@1.0.0
 infra:
   provider: bicep
 ```

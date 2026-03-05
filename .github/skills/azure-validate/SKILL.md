@@ -22,6 +22,16 @@ Used by the Deploy agent as hard gates before executing any deployment.
 All gates must pass before deployment proceeds. Each gate is a hard stop —
 failure means the deployment cannot continue until the issue is resolved.
 
+> [!CAUTION]
+> **GATE FAILURE POLICY**: If a gate fails and cannot be auto-remediated,
+> **present the failure to the user and ask how to proceed**.
+> Do NOT autonomously skip deployment or generate a dry-run summary.
+> The user must explicitly decide whether to:
+>
+> 1. Fix the issue and retry
+> 2. Skip the gate (accepting risk)
+> 3. Abort the deployment
+
 ### Gate Sequence
 
 ```text
@@ -379,14 +389,21 @@ Generate a structured validation report for the deployment summary:
 
 ## 10. Common Validation Failures
 
-| Failure                           | Gate         | Resolution                                                                        |
-| --------------------------------- | ------------ | --------------------------------------------------------------------------------- |
-| `az account show` returns nothing | Auth         | Run `az login`                                                                    |
-| Wrong subscription selected       | Subscription | Run `az account set --subscription {id}`                                          |
-| `bicep build` outputs errors      | Template     | Fix Bicep syntax errors                                                           |
-| Missing parameter value           | Parameters   | Add to `.bicepparam` or set azd env variable                                      |
-| Provider not registered           | Providers    | `az provider register --namespace {ns} --wait`                                    |
-| What-if shows unexpected deletes  | What-If      | Review template changes; may indicate renamed resources                           |
-| Resource stuck in `Creating`      | Post-Deploy  | Wait and retry; check Activity Log for errors                                     |
-| `Forbidden` on resource access    | Post-Deploy  | Verify RBAC; managed identity may need role assignment propagation (up to 10 min) |
-| Endpoint returns 404/503          | Connectivity | App may need time to start; check deployment logs                                 |
+> [!IMPORTANT]
+> For every failure below, if auto-remediation does not resolve the issue,
+> **prompt the user** with the error details and ask how to proceed.
+> Never autonomously skip deployment or generate a "blocked" summary.
+
+| Failure                           | Gate         | Auto-Fix Attempt                                                                  | If Auto-Fix Fails |
+| --------------------------------- | ------------ | --------------------------------------------------------------------------------- | ----------------- |
+| `az account show` returns nothing | Auth         | Prompt `az login`                                                                 | **Ask the user**  |
+| Wrong subscription selected       | Subscription | Run `az account set --subscription {id}`                                          | **Ask the user**  |
+| `bicep build` outputs errors      | Template     | Display errors for review                                                         | **Ask the user**  |
+| Bicep CLI not installed           | Template     | Try `az bicep install`                                                            | **Ask the user**  |
+| Azure CLI extension broken        | Auth         | Try removing broken extension                                                     | **Ask the user**  |
+| Missing parameter value           | Parameters   | Add to `.bicepparam` or set azd env variable                                      | **Ask the user**  |
+| Provider not registered           | Providers    | `az provider register --namespace {ns} --wait`                                    | **Ask the user**  |
+| What-if shows unexpected deletes  | What-If      | Review template changes; may indicate renamed resources                           | **Ask the user**  |
+| Resource stuck in `Creating`      | Post-Deploy  | Wait and retry; check Activity Log for errors                                     | **Ask the user**  |
+| `Forbidden` on resource access    | Post-Deploy  | Verify RBAC; managed identity may need role assignment propagation (up to 10 min) | **Ask the user**  |
+| Endpoint returns 404/503          | Connectivity | App may need time to start; check deployment logs                                 | **Ask the user**  |

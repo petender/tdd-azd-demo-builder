@@ -72,7 +72,7 @@ the Deploy agent (Step 5) handles the actual Azure deployment.
 
 **Before doing ANY work**, read these skills:
 
-1. **Read** `.github/skills/SKILL.md` — consolidated skill (defaults, AVM, Bicep patterns, artifacts, diagrams, demo guide)
+1. **Read** `.github/skills/SKILL.md` — consolidated skill (defaults, AVM, Bicep patterns, artifacts, diagrams, demo guide, **azure.yaml naming convention**)
 2. **Read** the template files for your artifacts:
    - `.github/skills/azure-artifacts/templates/04-implementation-plan.template.md`
    - `.github/skills/azure-artifacts/templates/04-governance-constraints.template.md`
@@ -83,6 +83,8 @@ the Deploy agent (Step 5) handles the actual Azure deployment.
    check API versions, find correct Bicep patterns via official docs
 4. **Read** `.github/instructions/bicep-policy-compliance.instructions.md` — governance
    compliance mandate, dynamic tag list, anti-patterns
+5. **Read** `.github/instructions/bicep-code-best-practices.instructions.md` — Bicep coding
+   standards, validation commands, and **azure.yaml naming convention** (`tdd-azd-{project}`)
 
 These skills are your single source of truth. Do NOT use hardcoded values.
 
@@ -194,7 +196,7 @@ Generate the structured implementation plan with these elements per resource:
     enableRbacAuthorization: true
     enablePurgeProtection: true
     softDeleteRetentionInDays: 90
-  tags: [Environment, ManagedBy, Project, Owner]
+  tags: [Environment, ManagedBy, Project, SecurityControl, Owner]
   naming: "kv-{short}-{env}-{suffix}"
 ```
 
@@ -317,6 +319,7 @@ var tags = {
   Environment: environment
   ManagedBy: 'Bicep'
   Project: projectName
+  SecurityControl: 'Ignore'
   Owner: owner
 }
 

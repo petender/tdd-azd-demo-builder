@@ -68,6 +68,24 @@ Deploys validated Bicep templates to Azure using `azd up`. Runs what-if analysis
 executes the deployment, validates deployed resources, and produces a
 deployment summary artifact.
 
+> [!CAUTION]
+> **HARD RULE — DEPLOYMENT MUST ALWAYS BE ATTEMPTED**
+>
+> The Deploy agent MUST always attempt the actual `azd up` deployment.
+> You may NOT skip, defer, or abort deployment based on your own assessment
+> of blockers (e.g., missing CLI tools, extension errors, auth issues).
+>
+> 1. **Try to resolve blockers** (install tools, fix auth, register providers)
+> 2. **If you cannot resolve a blocker**, present the issue to the user and
+>    ask them how to proceed — do NOT decide on their behalf
+> 3. **If the user tells you to proceed**, attempt the deployment anyway
+> 4. **If deployment fails**, present the full error and ask the user for
+>    a decision — do NOT autonomously choose to skip or generate a
+>    "dry-run only" summary
+>
+> The only acceptable reason to not run `azd up` is an explicit user
+> instruction to skip deployment.
+
 ## MANDATORY: Read Skills First
 
 > [!CAUTION]
@@ -91,6 +109,9 @@ deployment summary artifact.
 - ✅ Generate `06-deployment-summary.md` with deployment details and resource outputs
 - ✅ Update `scenario/{project}/README.md` — mark Step 5 (Deploy) complete
 - ✅ Handle deployment failures gracefully with clear error messages and rollback guidance
+- ✅ **ALWAYS attempt `azd up`** — never skip deployment autonomously
+- ✅ **ALWAYS prompt the user on failure** — present errors and ask for a decision
+- ✅ Try to resolve tooling blockers (install Bicep CLI, fix auth, register providers) before prompting
 
 ### DON'T
 
@@ -100,6 +121,9 @@ deployment summary artifact.
 - ❌ Ignore deployment errors — document them in the summary
 - ❌ Leave orphaned resources on failure — provide cleanup guidance
 - ❌ Assume deployment succeeded without post-deployment validation
+- ❌ **NEVER skip deployment because of tooling issues** — attempt fixes, then ask the user
+- ❌ **NEVER autonomously decide to generate a "dry-run only" or "blocked" summary** — the user decides
+- ❌ **NEVER proceed to DemoGuide without either a successful deployment or explicit user approval to skip**
 
 ## Prerequisites Check
 
@@ -272,17 +296,43 @@ Update `scenario/{project}/README.md`:
 
 ## Deployment Failure Handling
 
-| Failure Type                     | Action                                                         |
-| -------------------------------- | -------------------------------------------------------------- |
-| Authentication failure           | Prompt user to `az login` and retry                            |
-| Subscription quota exceeded      | Document in summary, suggest SKU alternatives                  |
-| Resource provider not registered | Auto-register with `az provider register --namespace {ns}`     |
-| Template validation error        | STOP — hand back to Bicep agent for fixes                      |
-| Partial deployment failure       | Document successful + failed resources, provide targeted retry |
-| Timeout                          | Check deployment status, wait or retry                         |
+> [!CAUTION]
+> **On ANY failure, present the error to the user and ask how to proceed.**
+> Do NOT autonomously decide to skip deployment, generate a dry-run summary,
+> or hand back to another agent without user consent.
 
-For any unrecoverable failure, generate `06-deployment-summary.md` with
-failure details and recommended next steps.
+| Failure Type                     | Action                                                                           |
+| -------------------------------- | -------------------------------------------------------------------------------- |
+| Authentication failure           | Try `az login`; if still failing, **ask the user** how to proceed                |
+| Azure CLI broken/extension error | Try to fix (remove extension, repair); if stuck, **ask the user**                |
+| Bicep CLI missing                | Try `az bicep install`; if it fails, **ask the user** to install manually        |
+| Subscription quota exceeded      | Present the error and suggest SKU alternatives; **ask the user** for decision    |
+| Resource provider not registered | Auto-register with `az provider register --namespace {ns}` and retry             |
+| Template validation error        | Present errors; **ask the user** whether to fix and retry or hand to Bicep agent |
+| Partial deployment failure       | Document successful + failed resources; **ask the user** for targeted retry      |
+| Timeout                          | Check deployment status; **ask the user** whether to wait or retry               |
+| Any other unrecoverable failure  | Present full error details; **ask the user** for next steps                      |
+
+### User Decision Options (present on failure)
+
+When prompting the user after a failure, offer these options:
+
+```text
+⚠️ DEPLOYMENT FAILED
+
+Error: {error description}
+
+How would you like to proceed?
+1. 🔄 Retry deployment (after fixing the issue)
+2. 🛠️ Hand back to Bicep agent to fix templates
+3. ⏭️ Skip deployment and continue to Demo Guide (dry-run)
+4. 🧹 Clean up and abort workflow
+5. 🔍 Investigate further (show detailed logs)
+```
+
+> [!IMPORTANT]
+> Only generate `06-deployment-summary.md` with "Dry Run" or "Failed" status
+> if the **user explicitly chooses** to skip or abort. Never make this decision autonomously.
 
 ## Output Files
 

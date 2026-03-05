@@ -93,6 +93,8 @@ Execution Lead for the Azure demo builder workflow.
 1. **Autonomous Execution**: Proceed through workflow steps automatically unless the user explicitly requests a pause
 2. **Context Efficiency**: Delegate heavy lifting to subagents to preserve context window
 3. **Structured Workflow**: Follow the 5-step process, tracking progress in artifacts
+4. **Mandatory Deployment**: The Deploy step (Step 5) MUST always attempt actual `azd up` — never skip it autonomously
+5. **User Decides on Failure**: If deployment fails, present the error to the user and ask for their decision — never autonomously skip or generate a dry-run summary
 
 ## DO / DON'T
 
@@ -111,6 +113,8 @@ Execution Lead for the Azure demo builder workflow.
 - ❌ Modify files directly — delegate to the appropriate agent
 - ❌ Include raw subagent dumps — summarize and present key findings
 - ❌ Skip step sequencing or handoff order
+- ❌ **NEVER skip the Deploy step (Step 5)** — always delegate to the Deploy agent and let it attempt `azd up`
+- ❌ **NEVER auto-advance past Deploy on failure** — if the Deploy agent reports a failure, present the error to the user and wait for their decision before proceeding to DemoGuide
 
 ## The Workflow
 
@@ -163,6 +167,19 @@ Artifact: scenario/{project}/06-deployment-summary.md
 ➡️ Continue automatically to Demo Guide (Step 6)
 ```
 
+> [!CAUTION]
+> **If the Deploy agent reports a failure or was unable to run `azd up`:**
+> Do NOT auto-advance to DemoGuide. Instead, present the failure summary
+> to the user and ask how to proceed. Options:
+>
+> 1. Retry deployment (after fixing the issue)
+> 2. Hand back to Bicep agent to fix templates
+> 3. Skip deployment and continue to Demo Guide (user’s explicit choice)
+> 4. Abort workflow
+>
+> Only proceed to Step 6 if deployment succeeded OR the user explicitly
+> chooses to continue without deployment.
+
 ### Checkpoint 5: After Demo Guide
 
 ```text
@@ -176,14 +193,14 @@ Artifact: scenario/{project}/08-demo-guide.md
 
 Use `#runSubagent` for each workflow step:
 
-| Step | Agent        | Key Prompt                                                                                                       |
-| ---- | ------------ | ---------------------------------------------------------------------------------------------------------------- |
-| 1    | Requirements | Parse the user's scenario description, extract requirements through all phases, then generate 01-requirements.md |
-| 2    | Architect    | Create architecture assessment for requirements in 01-requirements.md                                            |
-| 3    | Design       | Generate architecture diagrams and ADRs                                                                          |
-| 4    | Bicep        | Run governance discovery, plan, generate Bicep templates, and validate per 02-architecture-assessment.md         |
-| 5    | Deploy       | Run what-if analysis, prompt user, deploy to Azure, generate 06-deployment-summary.md                            |
-| 6    | DemoGuide    | Generate audience-aware demo runbook from all prior artifacts                                                    |
+| Step | Agent        | Key Prompt                                                                                                                                                                                                            |
+| ---- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Requirements | Parse the user's scenario description, extract requirements through all phases, then generate 01-requirements.md                                                                                                      |
+| 2    | Architect    | Create architecture assessment for requirements in 01-requirements.md                                                                                                                                                 |
+| 3    | Design       | Generate architecture diagrams and ADRs                                                                                                                                                                               |
+| 4    | Bicep        | Run governance discovery, plan, generate Bicep templates, and validate per 02-architecture-assessment.md                                                                                                              |
+| 5    | Deploy       | Run what-if analysis, prompt user, deploy to Azure with `azd up`, generate 06-deployment-summary.md. **MUST attempt actual deployment. On failure, report back so executionlead can prompt the user for a decision.** |
+| 6    | DemoGuide    | Generate audience-aware demo runbook from all prior artifacts                                                                                                                                                         |
 
 ## Starting a New Project
 

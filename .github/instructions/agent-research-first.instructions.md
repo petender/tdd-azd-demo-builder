@@ -94,18 +94,20 @@ This pattern enables thorough investigation without interrupting the workflow.
 - ❌ Recommend Azure services without checking documentation
 - ❌ Proceed with missing inputs from previous workflow steps
 - ❌ Make up information when uncertain
+- ❌ **Skip actual deployment (`azd up`) due to tooling blockers** — attempt fixes, then ask the user
+- ❌ **Autonomously generate a dry-run or blocked summary** — the user decides how to handle failures
 
 ## Per-Agent Research Focus
 
-| Agent            | Primary Research Focus                                            |
-| ---------------- | ----------------------------------------------------------------- |
-| **Requirements** | User needs, existing projects, compliance requirements            |
-| **Architect**    | Azure services, WAF pillars, SKU recommendations, pricing         |
-| **Design**       | Existing architecture, icon availability, layout patterns         |
-| **Bicep Plan**   | AVM availability, governance constraints, implementation patterns |
-| **Bicep Code**   | Module structure, naming conventions, security defaults           |
-| **Deploy**       | Template validation, what-if results, resource dependencies       |
-| **As-Built**     | Deployed resources, configuration details, operational procedures |
+| Agent            | Primary Research Focus                                                                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Requirements** | User needs, existing projects, compliance requirements                                                                                                |
+| **Architect**    | Azure services, WAF pillars, SKU recommendations, pricing                                                                                             |
+| **Design**       | Existing architecture, icon availability, layout patterns                                                                                             |
+| **Bicep Plan**   | AVM availability, governance constraints, implementation patterns                                                                                     |
+| **Bicep Code**   | Module structure, naming conventions, security defaults                                                                                               |
+| **Deploy**       | Template validation, what-if results, resource dependencies. **MUST always attempt `azd up`. On failure, prompt the user — never skip autonomously.** |
+| **As-Built**     | Deployed resources, configuration details, operational procedures                                                                                     |
 
 ## Integration with Workflow
 
