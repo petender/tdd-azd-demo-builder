@@ -135,6 +135,7 @@ Azure App Service, Container Apps, ACI, or AKS — never on VM-only scenarios.
 - ❌ Skip `dotnet build` validation
 - ❌ Hardcode Azure-specific config in the app — use environment variables and app settings
 - ❌ Forget to wire the service in `azure.yaml`
+- ❌ Create the `.sln` file in the workspace root — it MUST go in `scenario/{project}/`
 
 ## Prerequisites Check
 
@@ -176,6 +177,14 @@ Before starting, validate these artifacts exist in `scenario/{project}/`:
    ```powershell
    cd scenario/{project}/src
    dotnet new webapp --framework net10.0 --name {ProjectName}.Web --no-https
+   ```
+
+3. Create a solution file **in the scenario folder root** (not the workspace root):
+
+   ```powershell
+   cd scenario/{project}
+   dotnet new sln --name {ProjectName}
+   dotnet sln add src/{ProjectName}.Web/{ProjectName}.Web.csproj
    ```
 
 3. Verify scaffold succeeded with `dotnet build`
