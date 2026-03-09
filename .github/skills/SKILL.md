@@ -394,21 +394,49 @@ resource deployerKvRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = i
 
 ## 4. Architecture Diagrams
 
+> [!CAUTION]
+> **MANDATORY DELIVERABLES — Both diagram types are required for every scenario.**
+> A scenario is NOT complete without both the architecture diagram AND the runtime flow diagram.
+
 ### Output Naming
 
 ```text
 scenario/{project}/
-├── 03-des-diagram.py          # Python source (version controlled)
-├── 03-des-diagram.png         # PNG output
+├── 03-des-diagram.py              # Architecture diagram source
+├── 03-des-diagram.png             # Architecture diagram PNG
+├── 03-des-runtime-diagram.py      # Runtime flow diagram source
+├── 03-des-runtime-diagram.png     # Runtime flow diagram PNG
 ```
 
 ### Execution
 
-Save `.py` to `scenario/{project}/`, then execute:
+Save `.py` to `scenario/{project}/`, then execute **both**:
 
 ```bash
 python3 scenario/{project}/03-des-diagram.py
+python3 scenario/{project}/03-des-runtime-diagram.py
 ```
+
+Verify both PNGs exist on disk before marking Step 3 complete.
+
+### Diagram Types
+
+| Type                     | Purpose                                             | File Prefix              |
+| ------------------------ | --------------------------------------------------- | ------------------------ |
+| **Architecture Diagram** | Static resource layout, boundaries, Azure hierarchy | `03-des-diagram`         |
+| **Runtime Flow Diagram** | Data paths, request flows, auth chains at runtime   | `03-des-runtime-diagram` |
+
+### Runtime Flow Diagram Guidelines
+
+The runtime diagram shows how data and requests move through the architecture during operation:
+
+- **Request paths**: User → App Gateway/Front Door → App Service → Database
+- **Data flows**: App → Storage (read/write), App → Cache (read), App → Event Hub (publish)
+- **Auth flows**: App → Managed Identity → Key Vault, App → Entra ID
+- **Telemetry flows**: App → App Insights → Log Analytics
+- Use `Edge(label="...")` with flow taxonomy labels (request, read, write, auth, telemetry)
+- Use `Edge(style="dashed")` for config/secret retrieval flows
+- Use `direction="LR"` to emphasize the flow direction
 
 ### Diagram Contract
 
@@ -574,6 +602,30 @@ update date and progress percentage (each step ≈ 14%).
 ---
 
 ## 6. Demo Guide Patterns
+
+> [!CAUTION]
+> **MANDATORY — Playwright Screenshots Are Required**
+>
+> Every demo guide MUST include Playwright-captured screenshots of the deployed
+> Azure resources. This is a required deliverable, not a nice-to-have.
+> Screenshots MUST be stored in `scenario/{project}/demoguide/images/`.
+
+### Screenshot Requirements
+
+| Screenshot                               | Source                                   | Required  |
+| ---------------------------------------- | ---------------------------------------- | --------- |
+| Resource group overview                  | Azure Portal → Resource Group → Overview | Yes       |
+| Key resource detail (per major resource) | Azure Portal → Resource → Overview       | Yes       |
+| Network topology (if VNet present)       | Azure Portal → VNet → Diagram            | If VNet   |
+| Demo step result (per step)              | Portal view showing expected outcome     | Yes       |
+| Deployed webapp homepage (if webapp)     | Live webapp URL in browser               | If webapp |
+
+### Screenshot Workflow
+
+1. Use Playwright MCP `browser_take_screenshot` to capture each required screenshot
+2. Store in `scenario/{project}/demoguide/images/` with descriptive filenames
+3. Reference in demo guide using: `<img src="demoguide/images/{filename}.png" alt="{desc}" style="width:70%;" />`
+4. If Playwright unavailable: insert `TODO: capture screenshot` placeholders **and report to user**
 
 {context will be added later}
 

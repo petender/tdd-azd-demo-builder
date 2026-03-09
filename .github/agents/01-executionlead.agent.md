@@ -155,6 +155,28 @@ Artifact: scenario/{project}/02-architecture-assessment.md
 ➡️ Continue automatically to Design (Step 3)
 ```
 
+### Checkpoint 2b: After Design (VERIFICATION GATE)
+
+> [!CAUTION]
+> **MANDATORY — Verify runtime flow diagram exists before proceeding.**
+> After the Diagrammer agent completes, check that BOTH diagram PNGs exist:
+>
+> - `scenario/{project}/03-des-diagram.png`
+> - `scenario/{project}/03-des-runtime-diagram.png`
+>
+> If the runtime flow diagram is missing, **send the Diagrammer agent back**
+> to generate it. Do NOT proceed to Bicep without both diagrams.
+
+```text
+🎨 DESIGN ARTIFACTS COMPLETE
+Artifacts:
+  - scenario/{project}/03-des-diagram.py + .png
+  - scenario/{project}/03-des-runtime-diagram.py + .png (MANDATORY)
+  - scenario/{project}/03-des-adr.md
+✅ Both diagram PNGs verified on disk
+➡️ Continue automatically to Bicep (Step 4)
+```
+
 ### Checkpoint 3: After Bicep
 
 ```text
@@ -200,11 +222,23 @@ Artifact: scenario/{project}/06-deployment-summary.md
 > Only proceed to Step 6 if deployment succeeded OR the user explicitly
 > chooses to continue without deployment.
 
-### Checkpoint 5: After Demo Guide
+### Checkpoint 5: After Demo Guide (VERIFICATION GATE)
+
+> [!CAUTION]
+> **MANDATORY — Verify Playwright screenshots exist before marking complete.**
+> After the DemoGuide agent completes, check that:
+>
+> - `scenario/{project}/demoguide/images/` contains screenshot PNGs, OR
+> - The demo guide explicitly documents why screenshots could not be captured
+>
+> If screenshots are missing without explanation, **send the DemoGuide agent back**
+> to capture them. Do NOT mark the workflow complete without screenshot evidence.
 
 ```text
 🎬 DEMO GUIDE COMPLETE
 Artifact: scenario/{project}/08-demo-guide.md
+Screenshots: scenario/{project}/demoguide/images/*.png (MANDATORY)
+✅ Playwright screenshots captured or fallback documented
 ✅ Workflow complete.
 ➡️ Mark workflow complete
 ```
@@ -217,11 +251,11 @@ Use `#runSubagent` for each workflow step:
 | ---- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1    | Requirements | Parse the user's scenario description, extract requirements through all phases, then generate 01-requirements.md                                                                                                      |
 | 2    | Architect    | Create architecture assessment for requirements in 01-requirements.md                                                                                                                                                 |
-| 3    | Design       | Generate architecture diagrams and ADRs                                                                                                                                                                               |
-| 4    | Bicep        | Run governance discovery, plan, generate Bicep templates, and validate per 02-architecture-assessment.md                                                                                                              |
+| 3    | Design       | Generate **both** architecture diagram AND runtime flow diagram, plus ADRs. **VERIFY both PNGs exist before proceeding.**                                                                                             |
+| 4    | Bicep        | Run governance discovery, plan, generate Bicep templates, generate dependency + runtime diagrams, and validate per 02-architecture-assessment.md                                                                      |
 | 4b   | Development  | Scaffold .NET 10 sample webapp with {industry} seed data, wire into azure.yaml, validate build. **Skip if VM-only or user declined.**                                                                                 |
 | 5    | Deploy       | Run what-if analysis, prompt user, deploy to Azure with `azd up`, generate 06-deployment-summary.md. **MUST attempt actual deployment. On failure, report back so executionlead can prompt the user for a decision.** |
-| 6    | DemoGuide    | Generate audience-aware demo runbook from all prior artifacts                                                                                                                                                         |
+| 6    | DemoGuide    | Generate audience-aware demo runbook with **Playwright screenshots** of deployed resources. **VERIFY screenshots exist in `demoguide/images/` before marking complete.**                                              |
 
 ## Starting a New Project
 
@@ -241,17 +275,22 @@ Use `#runSubagent` for each workflow step:
 
 ## Artifact Tracking
 
-| Step | Artifact                        | Check            |
-| ---- | ------------------------------- | ---------------- |
-| 1    | `01-requirements.md`            | Exists?          |
-| 2    | `02-architecture-assessment.md` | Exists?          |
-| 3    | `03-des-*.md`, `03-des-*.py`    | Exists?          |
-| 4    | `04-implementation-plan.md`     | Exists?          |
-| 4    | `scenario/{project}/infra/`     | Templates valid? |
-| 4b   | `07-webapp-summary.md`          | Conditional      |
-| 4b   | `scenario/{project}/src/`       | Conditional      |
-| 5    | `06-deployment-summary.md`      | Exists?          |
-| 6    | `08-demo-guide.md`              | Required         |
+| Step | Artifact                             | Check                                            |
+| ---- | ------------------------------------ | ------------------------------------------------ |
+| 1    | `01-requirements.md`                 | Exists?                                          |
+| 2    | `02-architecture-assessment.md`      | Exists?                                          |
+| 3    | `03-des-diagram.py` + `.png`         | Both exist?                                      |
+| 3    | `03-des-runtime-diagram.py` + `.png` | **MANDATORY** — both exist?                      |
+| 3    | `03-des-adr.md`                      | Exists?                                          |
+| 4    | `04-implementation-plan.md`          | Exists?                                          |
+| 4    | `04-dependency-diagram.py` + `.png`  | Both exist?                                      |
+| 4    | `04-runtime-diagram.py` + `.png`     | Both exist?                                      |
+| 4    | `scenario/{project}/infra/`          | Templates valid?                                 |
+| 4b   | `07-webapp-summary.md`               | Conditional                                      |
+| 4b   | `scenario/{project}/src/`            | Conditional                                      |
+| 5    | `06-deployment-summary.md`           | Exists?                                          |
+| 6    | `08-demo-guide.md`                   | Required                                         |
+| 6    | `demoguide/images/*.png`             | **MANDATORY** — screenshots captured or fallback |
 
 ## Model Selection
 

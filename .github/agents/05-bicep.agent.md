@@ -118,6 +118,10 @@ These skills are your single source of truth. Do NOT use hardcoded values.
 - ✅ Auto-generate Step 4 diagrams in the same run:
   - `04-dependency-diagram.py` + `04-dependency-diagram.png`
   - `04-runtime-diagram.py` + `04-runtime-diagram.png`
+    > [!CAUTION]
+    > These diagrams are **MANDATORY** deliverables. The Bicep step is NOT
+    > complete until both diagram PNGs exist on disk. Execute each `.py` file
+    > and verify the `.png` was created before proceeding.
 - ✅ Update `scenario/{project}/README.md` — mark Step 4 complete, add your artifacts (see azure-artifacts skill)
 
 ### DON'T
@@ -208,6 +212,14 @@ Include:
 - **Deployment Phases** section (from automatic Phase 2.5 selection)
 - Python dependency diagram artifact (`04-dependency-diagram.py` + `.png`)
 - Python runtime flow diagram artifact (`04-runtime-diagram.py` + `.png`)
+
+> [!CAUTION]
+> **HARD GATE — DIAGRAMS ARE MANDATORY**
+>
+> Both diagrams MUST be generated and their PNGs verified on disk before
+> the implementation plan is considered complete. Run each `.py` script
+> and check that the `.png` file exists. If generation fails, fix and retry.
+
 - Naming conventions table (from azure-defaults CAF section)
 - Security configuration matrix
 - Estimated implementation time

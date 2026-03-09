@@ -83,7 +83,9 @@ with talking points, and produces contingency playbooks for live presentations.
 - ✅ Include actual Azure CLI/Portal commands — not pseudocode
 - ✅ Cross-reference deployed resources from Bicep templates
 - ✅ Generate pre-demo validation commands the presenter can run
-- ✅ Capture real screenshots with Playwright MCP when an authenticated session is available
+- ✅ **ALWAYS capture screenshots with Playwright MCP** — this is a required deliverable, not optional
+- ✅ Store all screenshots in `scenario/{project}/demoguide/images/`
+- ✅ Verify screenshot files exist on disk before marking Step 6 complete
 
 ### DON'T
 
@@ -93,7 +95,8 @@ with talking points, and produces contingency playbooks for live presentations.
 - ❌ Skip the pre-demo checklist — presenters rely on it
 - ❌ Assume Azure connectivity — include offline fallback guidance
 - ❌ Generate content that contradicts the architecture assessment
-- ❌ Mark demo guide complete without required screenshot evidence or explicit fallback note
+- ❌ **NEVER skip Playwright screenshot capture** — attempt it first, document fallback only if truly unavailable
+- ❌ **NEVER mark demo guide complete without screenshot evidence or an explicit documented fallback**
 
 ---
 
@@ -162,6 +165,19 @@ For each resource in the architecture, document:
 
 ### Phase 6: Screenshot Capture (Playwright MCP)
 
+> [!CAUTION]
+> **HARD RULE — SCREENSHOT CAPTURE IS MANDATORY**
+>
+> Capturing Playwright screenshots of the deployed Azure resources is a
+> **required deliverable** for the demo guide. This is NOT optional.
+>
+> 1. **ALWAYS attempt** Playwright MCP screenshot capture first
+> 2. Navigate to the Azure Portal and deployed webapp to capture evidence
+> 3. If Playwright MCP is unavailable or fails, **present the failure to the
+>    user** and ask how to proceed — do not silently skip
+> 4. Only insert TODO placeholders if the **user explicitly declines** or
+>    Playwright is confirmed unavailable after troubleshooting
+
 Capture screenshots of the deployed Azure resources to embed in the demo guide.
 This is a **required** step — the demo guide template expects inline screenshots
 for resource overviews and each demo step.
@@ -184,17 +200,21 @@ for resource overviews and each demo step.
 
 **Minimum screenshots required:**
 
-| Screenshot                               | Portal Blade / View                          |
-| ---------------------------------------- | -------------------------------------------- |
-| Resource group overview                  | Resource Group → Overview                    |
-| Key resource detail (per major resource) | Resource → Overview / Properties             |
-| Network topology (if applicable)         | Virtual Network → Diagram or Topology        |
-| Demo step result (per step)              | The Portal view showing the expected outcome |
+| Screenshot                               | Portal Blade / View                          | Required  |
+| ---------------------------------------- | -------------------------------------------- | --------- |
+| Resource group overview                  | Resource Group → Overview                    | Yes       |
+| Key resource detail (per major resource) | Resource → Overview / Properties             | Yes       |
+| Network topology (if applicable)         | Virtual Network → Diagram or Topology        | If VNet   |
+| Demo step result (per step)              | The Portal view showing the expected outcome | Yes       |
+| Deployed webapp homepage (if webapp)     | The live webapp URL in a browser             | If webapp |
 
-> [!NOTE]
+> [!IMPORTANT]
 > If Playwright MCP is unavailable or the user declines the browser session,
-> insert placeholder `<img>` tags with `TODO: capture screenshot` alt text
-> so the presenter can add them manually.
+> you MUST:
+>
+> 1. Insert placeholder `<img>` tags with `TODO: capture screenshot` alt text
+> 2. Document a brief note explaining why live screenshots were not captured
+> 3. **Report this to the user** — do not silently continue without screenshots
 
 ### Phase 7: Artifact Generation
 
