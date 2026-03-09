@@ -15,7 +15,7 @@
 | ---- | ------------ | --------------------------------------------------------- | ----------- |
 | 1    | Requirements | `01-requirements.md`                                      | Automatic   |
 | 2    | Architect    | `02-architecture-assessment.md`                           | Automatic   |
-| 3    | Diagrammer   | `03-des-*.{py,png,md}`                                    | Automatic   |
+| 3    | Diagrammer   | `03-architect-*.{py,png,md}`                              | Automatic   |
 | 4    | Bicep        | `04-implementation-plan.md` + `scenario/{project}/infra/` | Automatic   |
 | 4b   | Development  | `07-webapp-summary.md` + `scenario/{project}/src/`        | Conditional |
 | 5    | Deploy       | `06-deployment-summary.md`                                | Automatic   |

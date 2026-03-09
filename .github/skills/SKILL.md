@@ -402,10 +402,10 @@ resource deployerKvRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = i
 
 ```text
 scenario/{project}/
-├── 03-des-diagram.py              # Architecture diagram source
-├── 03-des-diagram.png             # Architecture diagram PNG
-├── 03-des-runtime-diagram.py      # Runtime flow diagram source
-├── 03-des-runtime-diagram.png     # Runtime flow diagram PNG
+├── 03-architect-diagram.py              # Architecture diagram source
+├── 03-architect-diagram.png             # Architecture diagram PNG
+├── 03-architect-runtime-diagram.py      # Runtime flow diagram source
+├── 03-architect-runtime-diagram.png     # Runtime flow diagram PNG
 ```
 
 ### Execution
@@ -413,18 +413,18 @@ scenario/{project}/
 Save `.py` to `scenario/{project}/`, then execute **both**:
 
 ```bash
-python3 scenario/{project}/03-des-diagram.py
-python3 scenario/{project}/03-des-runtime-diagram.py
+python3 scenario/{project}/03-architect-diagram.py
+python3 scenario/{project}/03-architect-runtime-diagram.py
 ```
 
 Verify both PNGs exist on disk before marking Step 3 complete.
 
 ### Diagram Types
 
-| Type                     | Purpose                                             | File Prefix              |
-| ------------------------ | --------------------------------------------------- | ------------------------ |
-| **Architecture Diagram** | Static resource layout, boundaries, Azure hierarchy | `03-des-diagram`         |
-| **Runtime Flow Diagram** | Data paths, request flows, auth chains at runtime   | `03-des-runtime-diagram` |
+| Type                     | Purpose                                             | File Prefix                    |
+| ------------------------ | --------------------------------------------------- | ------------------------------ |
+| **Architecture Diagram** | Static resource layout, boundaries, Azure hierarchy | `03-architect-diagram`         |
+| **Runtime Flow Diagram** | Data paths, request flows, auth chains at runtime   | `03-architect-runtime-diagram` |
 
 ### Runtime Flow Diagram Guidelines
 

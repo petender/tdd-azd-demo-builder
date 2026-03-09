@@ -63,14 +63,14 @@ renders correctly.
 
 ### Step 5: Save Artifacts
 
-Save to `scenario/{projectName}/03-des-diagram.py`.
+Save to `scenario/{projectName}/03-architect-diagram.py`.
 
 ## Output Expectations
 
 ```text
 scenario/{projectName}/
-├── 03-des-diagram.py     # Python source
-└── 03-des-diagram.png    # Rendered output
+├── 03-architect-diagram.py     # Python source
+└── 03-architect-diagram.png    # Rendered output
 ```
 
 ## Quality Assurance

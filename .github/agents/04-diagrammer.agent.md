@@ -74,8 +74,8 @@ tools:
 >
 > Every scenario MUST produce **both** diagrams:
 >
-> 1. **Architecture diagram** (`03-des-diagram.py` + `.png`) — static resource layout
-> 2. **Runtime flow diagram** (`03-des-runtime-diagram.py` + `.png`) — data and request flows at runtime
+> 1. **Architecture diagram** (`03-architect-diagram.py` + `.png`) — static resource layout
+> 2. **Runtime flow diagram** (`03-architect-runtime-diagram.py` + `.png`) — data and request flows at runtime
 >
 > The workflow is NOT complete until both diagrams exist as PNG files on disk.
 > Do not skip, defer, or mark Step 3 complete without both.
@@ -94,8 +94,8 @@ tools:
 - ✅ Use the `azure-diagrams` skill for Python architecture diagrams
 - ✅ Use the `SKILLS.md` skill file for any details
 - ✅ Generate **both** the architecture diagram AND the runtime flow diagram — both are required
-- ✅ Save architecture diagram to `scenario/{project}/03-des-diagram.py`
-- ✅ Save runtime flow diagram to `scenario/{project}/03-des-runtime-diagram.py`
+- ✅ Save architecture diagram to `scenario/{project}/03-architect-diagram.py`
+- ✅ Save runtime flow diagram to `scenario/{project}/03-architect-runtime-diagram.py`
 - ✅ Execute both Python scripts to generate PNGs and verify the images exist on disk
 - ✅ Include all Azure resources from the architecture in diagrams
 - ✅ Show data flows, request paths, and authentication flows in the runtime diagram
@@ -122,10 +122,10 @@ If missing, STOP and request handoff to Architect agent.
 
 1. Read `02-architecture-assessment.md` for resource list, boundaries, and flows
 2. Read `01-requirements.md` for business-critical paths and actor context
-3. Generate `scenario/{project}/03-des-diagram.py` using the azure-diagrams contract
-4. Execute `python3 scenario/{project}/03-des-diagram.py`
+3. Generate `scenario/{project}/03-architect-diagram.py` using the azure-diagrams contract
+4. Execute `python3 scenario/{project}/03-architect-diagram.py`
 5. Validate quality gate score (>=9/10); regenerate once if below threshold
-6. Verify `03-des-diagram.png` exists on disk
+6. Verify `03-architect-diagram.png` exists on disk
 
 ### Phase 2: Runtime Flow Diagram (MANDATORY)
 
@@ -139,18 +139,18 @@ If missing, STOP and request handoff to Architect agent.
    - Authentication flows (Managed Identity, Entra ID)
    - Monitoring/telemetry flows (App Insights, Log Analytics)
    - Event/message flows (Service Bus, Event Grid) if applicable
-2. Generate `scenario/{project}/03-des-runtime-diagram.py` using the azure-diagrams contract
+2. Generate `scenario/{project}/03-architect-runtime-diagram.py` using the azure-diagrams contract
    - Use `direction="LR"` (left-to-right) to show flow direction clearly
    - Use `Edge(label="...")` with flow taxonomy labels (request, read, write, auth, telemetry, etc.)
    - Use `Edge(style="dashed")` for config/secret flows
    - Group resources into Clusters matching the Azure hierarchy
-3. Execute `python3 scenario/{project}/03-des-runtime-diagram.py`
+3. Execute `python3 scenario/{project}/03-architect-runtime-diagram.py`
 4. Validate quality gate score (>=9/10); regenerate once if below threshold
-5. Verify `03-des-runtime-diagram.png` exists on disk
+5. Verify `03-architect-runtime-diagram.png` exists on disk
 
 ### Phase 3: ADR Generation
 
-Generate `scenario/{project}/03-des-adr.md` documenting key architecture decisions.
+Generate `scenario/{project}/03-architect-adr.md` documenting key architecture decisions.
 
 ### Phase 4: Completion Validation
 
@@ -159,11 +159,11 @@ Before marking Step 3 complete, verify ALL outputs exist:
 ```powershell
 $project = "scenario/{project}"
 @(
-  "$project/03-des-diagram.py",
-  "$project/03-des-diagram.png",
-  "$project/03-des-runtime-diagram.py",
-  "$project/03-des-runtime-diagram.png",
-  "$project/03-des-adr.md"
+  "$project/03-architect-diagram.py",
+  "$project/03-architect-diagram.png",
+  "$project/03-architect-runtime-diagram.py",
+  "$project/03-architect-runtime-diagram.png",
+  "$project/03-architect-adr.md"
 ) | ForEach-Object {
   if (Test-Path $_) { Write-Host "✅ $_" } else { Write-Error "❌ MISSING: $_" }
 }
@@ -173,13 +173,13 @@ If any mandatory file is missing, fix and regenerate before proceeding.
 
 ## Output Files
 
-| File                         | Location                                        | Required |
-| ---------------------------- | ----------------------------------------------- | -------- |
-| Architecture Diagram Source  | `scenario/{project}/03-des-diagram.py`          | Yes      |
-| Architecture Diagram Image   | `scenario/{project}/03-des-diagram.png`         | Yes      |
-| Runtime Flow Diagram Source  | `scenario/{project}/03-des-runtime-diagram.py`  | Yes      |
-| Runtime Flow Diagram Image   | `scenario/{project}/03-des-runtime-diagram.png` | Yes      |
-| Architecture Decision Record | `scenario/{project}/03-des-adr.md`              | Yes      |
+| File                         | Location                                              | Required |
+| ---------------------------- | ----------------------------------------------------- | -------- |
+| Architecture Diagram Source  | `scenario/{project}/03-architect-diagram.py`          | Yes      |
+| Architecture Diagram Image   | `scenario/{project}/03-architect-diagram.png`         | Yes      |
+| Runtime Flow Diagram Source  | `scenario/{project}/03-architect-runtime-diagram.py`  | Yes      |
+| Runtime Flow Diagram Image   | `scenario/{project}/03-architect-runtime-diagram.png` | Yes      |
+| Architecture Decision Record | `scenario/{project}/03-architect-adr.md`              | Yes      |
 
 ## Validation Checklist
 

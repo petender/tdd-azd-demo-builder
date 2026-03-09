@@ -77,7 +77,7 @@ Break down by resource, include reserved instance savings options.
 Save to `scenario/{projectName}/`:
 
 - `02-architecture-assessment.md` — WAF scores, service recommendations
-- `03-des-cost-estimate.md` — detailed cost breakdown
+- `03-architect-cost-estimate.md` — detailed cost breakdown
 
 ## Output Expectations
 

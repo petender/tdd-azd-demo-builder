@@ -122,7 +122,7 @@ Execution Lead for the Azure demo builder workflow.
 ```text
 Step 1: Requirements    →  01-requirements.md
 Step 2: Architecture    →  02-architecture-assessment.md
-Step 3: Design          →  03-des-*.md/py
+Step 3: Design          →  03-architect-*.md/py
 Step 4: Bicep           →  04-implementation-plan.md + scenario/{project}/infra/
 Step 4b: Development    →  07-webapp-summary.md + scenario/{project}/src/ (conditional)
 Step 5: Deploy          →  06-deployment-summary.md
@@ -161,8 +161,8 @@ Artifact: scenario/{project}/02-architecture-assessment.md
 > **MANDATORY — Verify runtime flow diagram exists before proceeding.**
 > After the Diagrammer agent completes, check that BOTH diagram PNGs exist:
 >
-> - `scenario/{project}/03-des-diagram.png`
-> - `scenario/{project}/03-des-runtime-diagram.png`
+> - `scenario/{project}/03-architect-diagram.png`
+> - `scenario/{project}/03-architect-runtime-diagram.png`
 >
 > If the runtime flow diagram is missing, **send the Diagrammer agent back**
 > to generate it. Do NOT proceed to Bicep without both diagrams.
@@ -170,9 +170,9 @@ Artifact: scenario/{project}/02-architecture-assessment.md
 ```text
 🎨 DESIGN ARTIFACTS COMPLETE
 Artifacts:
-  - scenario/{project}/03-des-diagram.py + .png
-  - scenario/{project}/03-des-runtime-diagram.py + .png (MANDATORY)
-  - scenario/{project}/03-des-adr.md
+  - scenario/{project}/03-architect-diagram.py + .png
+  - scenario/{project}/03-architect-runtime-diagram.py + .png (MANDATORY)
+  - scenario/{project}/03-architect-adr.md
 ✅ Both diagram PNGs verified on disk
 ➡️ Continue automatically to Bicep (Step 4)
 ```
@@ -275,22 +275,22 @@ Use `#runSubagent` for each workflow step:
 
 ## Artifact Tracking
 
-| Step | Artifact                             | Check                                            |
-| ---- | ------------------------------------ | ------------------------------------------------ |
-| 1    | `01-requirements.md`                 | Exists?                                          |
-| 2    | `02-architecture-assessment.md`      | Exists?                                          |
-| 3    | `03-des-diagram.py` + `.png`         | Both exist?                                      |
-| 3    | `03-des-runtime-diagram.py` + `.png` | **MANDATORY** — both exist?                      |
-| 3    | `03-des-adr.md`                      | Exists?                                          |
-| 4    | `04-implementation-plan.md`          | Exists?                                          |
-| 4    | `04-dependency-diagram.py` + `.png`  | Both exist?                                      |
-| 4    | `04-runtime-diagram.py` + `.png`     | Both exist?                                      |
-| 4    | `scenario/{project}/infra/`          | Templates valid?                                 |
-| 4b   | `07-webapp-summary.md`               | Conditional                                      |
-| 4b   | `scenario/{project}/src/`            | Conditional                                      |
-| 5    | `06-deployment-summary.md`           | Exists?                                          |
-| 6    | `08-demo-guide.md`                   | Required                                         |
-| 6    | `demoguide/images/*.png`             | **MANDATORY** — screenshots captured or fallback |
+| Step | Artifact                                   | Check                                            |
+| ---- | ------------------------------------------ | ------------------------------------------------ |
+| 1    | `01-requirements.md`                       | Exists?                                          |
+| 2    | `02-architecture-assessment.md`            | Exists?                                          |
+| 3    | `03-architect-diagram.py` + `.png`         | Both exist?                                      |
+| 3    | `03-architect-runtime-diagram.py` + `.png` | **MANDATORY** — both exist?                      |
+| 3    | `03-architect-adr.md`                      | Exists?                                          |
+| 4    | `04-implementation-plan.md`                | Exists?                                          |
+| 4    | `04-dependency-diagram.py` + `.png`        | Both exist?                                      |
+| 4    | `04-runtime-diagram.py` + `.png`           | Both exist?                                      |
+| 4    | `scenario/{project}/infra/`                | Templates valid?                                 |
+| 4b   | `07-webapp-summary.md`                     | Conditional                                      |
+| 4b   | `scenario/{project}/src/`                  | Conditional                                      |
+| 5    | `06-deployment-summary.md`                 | Exists?                                          |
+| 6    | `08-demo-guide.md`                         | Required                                         |
+| 6    | `demoguide/images/*.png`                   | **MANDATORY** — screenshots captured or fallback |
 
 ## Model Selection
 

@@ -106,7 +106,7 @@ With this final step completed successfully, **after** running the validation, *
 scenario/{projectName}/
 ├── 01-requirements.md
 ├── 02-architecture-assessment.md
-├── 03-design-diagram.py
+├── 03-architect-diagram.py
 ├── 04-implementation-plan.md
 ├── 04-dependency-diagram.py
 ├── 04-dependency-diagram.png

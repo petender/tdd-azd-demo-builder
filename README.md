@@ -26,14 +26,14 @@ The workflow is a six-step pipeline. Each step is handled by a dedicated agent t
 └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
-| Step | Agent           | What It Does                                                   | Key Output                                      |
-| ---- | --------------- | -------------------------------------------------------------- | ----------------------------------------------- |
-| 1    | **Validations** | Parses your scenario description into structured requirements  | `01-requirements.md`                            |
-| 2    | **Architect**   | Recommends Azure services, SKUs, and documents trade-offs      | `02-architecture-assessment.md`                 |
-| 3    | **Diagrammer**  | Generates Python-based architecture diagrams and ADRs          | `03-des-diagram.py`, `03-des-diagram.png`       |
-| 4    | **Bicep**       | Runs governance discovery, generates AVM-first Bicep templates | `infra/main.bicep`, `04-implementation-plan.md` |
-| 5    | **Deploy**      | Runs `azd up` with what-if analysis and validates deployment   | `06-deployment-summary.md`                      |
-| 6    | **DemoGuide**   | Produces an audience-aware demo runbook with talking points    | `08-demo-guide.md`                              |
+| Step | Agent           | What It Does                                                   | Key Output                                            |
+| ---- | --------------- | -------------------------------------------------------------- | ----------------------------------------------------- |
+| 1    | **Validations** | Parses your scenario description into structured requirements  | `01-requirements.md`                                  |
+| 2    | **Architect**   | Recommends Azure services, SKUs, and documents trade-offs      | `02-architecture-assessment.md`                       |
+| 3    | **Diagrammer**  | Generates Python-based architecture diagrams and ADRs          | `03-architect-diagram.py`, `03-architect-diagram.png` |
+| 4    | **Bicep**       | Runs governance discovery, generates AVM-first Bicep templates | `infra/main.bicep`, `04-implementation-plan.md`       |
+| 5    | **Deploy**      | Runs `azd up` with what-if analysis and validates deployment   | `06-deployment-summary.md`                            |
+| 6    | **DemoGuide**   | Produces an audience-aware demo runbook with talking points    | `08-demo-guide.md`                                    |
 
 All artifacts land in `scenario/{project}/`, giving you a self-contained, version-controlled demo package.
 
@@ -142,7 +142,7 @@ scenario/                      # Generated demo projects (one folder per scenari
 ├── webvm-sqlvm-bastion-fw/    # Example: VMs + Bastion + Firewall
 │   ├── 01-requirements.md
 │   ├── 02-architecture-assessment.md
-│   ├── 03-des-diagram.py
+│   ├── 03-architect-diagram.py
 │   ├── 04-implementation-plan.md
 │   ├── 06-deployment-summary.md
 │   ├── 08-demo-guide.md

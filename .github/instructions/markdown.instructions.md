@@ -79,9 +79,9 @@ Python diagrams (`.png`/`.svg`) and embed with Markdown images.
 ### Good Example - External diagram embed
 
 ```markdown
-![Design Architecture](./03-des-diagram.png)
+![Design Architecture](./03-architect-diagram.png)
 
-Source: `03-des-diagram.py`
+Source: `03-architect-diagram.py`
 ```
 
 ### Mermaid Usage

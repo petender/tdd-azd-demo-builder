@@ -247,7 +247,7 @@ Each agent writes its output to `scenario/{project}/` with a numbered prefix:
 scenario/{project}/
 ├── 01-requirements.md            ← Written by Validations agent
 ├── 02-architecture-assessment.md ← Written by Architect agent
-├── 03-des-diagram.py             ← Written by Diagrammer agent
+├── 03-architect-diagram.py             ← Written by Diagrammer agent
 ├── 04-implementation-plan.md     ← Written by Bicep agent
 ├── infra/main.bicep              ← Written by Bicep agent
 ├── 06-deployment-summary.md      ← Written by Deploy agent
@@ -341,7 +341,7 @@ executionlead receives user prompt
     │   └─ Architect agent reads 01-requirements.md, writes 02-architecture-assessment.md
     │
     ├─ runSubagent("04-Diagrammer", "Generate architecture diagrams")
-    │   └─ Diagrammer agent reads 02-*.md, writes 03-des-diagram.py + .png
+    │   └─ Diagrammer agent reads 02-*.md, writes 03-architect-diagram.py + .png
     │
     ├─ runSubagent("05-Bicep", "Generate Bicep templates per 02-*.md")
     │   └─ Bicep agent reads 02-*.md, writes infra/ + 04-*.md + 05-*.md

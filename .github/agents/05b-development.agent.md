@@ -187,7 +187,7 @@ Before starting, validate these artifacts exist in `scenario/{project}/`:
    dotnet sln add src/{ProjectName}.Web/{ProjectName}.Web.csproj
    ```
 
-3. Verify scaffold succeeded with `dotnet build`
+4. Verify scaffold succeeded with `dotnet build`
 
 ### Phase 3: Generate Industry-Specific Models and Data
 
