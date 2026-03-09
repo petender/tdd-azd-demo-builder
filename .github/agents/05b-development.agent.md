@@ -1,6 +1,6 @@
 ---
 name: 05b-Development
-description: Scaffolds and generates a .NET 10 C# sample web application tailored to the project's business industry, with local sample data. Supports App Service, Container Apps, ACI, and AKS deployment targets. Skips VM-only scenarios.
+description: Scaffolds and generates a .NET 10 C# sample web application tailored to the project's business industry. Uses Azure data services (Storage Table, SQL, Cosmos DB, etc.) when present in the architecture, falling back to local JSON seed data only when no data endpoint exists. Supports App Service, Container Apps, ACI, and AKS deployment targets. Skips VM-only scenarios.
 model: "Claude Opus 4.6"
 user-invokable: true
 argument-hint: Provide the project folder name and business industry for the sample web app (e.g., healthcare, retail, finance)
@@ -63,9 +63,11 @@ tools:
 
 **Step 4b** of the workflow: `requirements → architect → design → bicep → [development] → deploy → demoguide`
 
-Scaffolds a .NET 10 C# sample web application with industry-specific local
-sample data. The app runs on Azure App Service, Container Apps, ACI, or AKS —
-never on VM-only scenarios.
+Scaffolds a .NET 10 C# sample web application with industry-specific data.
+When the architecture includes a data service (Storage Table, SQL Database,
+Cosmos DB, etc.), the app stores and retrieves data from that service. When no
+data endpoint is present, the app falls back to local JSON seed files. Runs on
+Azure App Service, Container Apps, ACI, or AKS — never on VM-only scenarios.
 
 ## MANDATORY: Read Skills First
 
@@ -101,10 +103,11 @@ never on VM-only scenarios.
 ## Core Principles
 
 1. **Always .NET 10**: Use `dotnet new webapp` with `--framework net10.0`
-2. **Local Sample Data**: No external database dependency — use in-memory data with static JSON seed files
-3. **Industry-Aware**: Generate domain models and seed data matching the project's business industry
-4. **Container-Ready**: For container targets, include a multi-stage `Dockerfile`
-5. **azd-Integrated**: Wire the app as a service in `azure.yaml` so `azd deploy` picks it up
+2. **Data Backend First**: If the architecture includes a data service (Storage Table, SQL Database, Cosmos DB, Event Hub, Service Bus, Redis, etc.), use that service as the app's data store via the appropriate SDK. Seed the service with sample data on first run.
+3. **Local JSON Fallback**: Only use in-memory data with static JSON seed files when the architecture has **no** data endpoint
+4. **Industry-Aware**: Generate domain models and seed data matching the project's business industry
+5. **Container-Ready**: For container targets, include a multi-stage `Dockerfile`
+6. **azd-Integrated**: Wire the app as a service in `azure.yaml` so `azd deploy` picks it up
 
 ## DO / DON'T
 
@@ -114,8 +117,9 @@ never on VM-only scenarios.
 - ✅ Scaffold using `dotnet new webapp --framework net10.0 --name {ProjectName}.Web`
 - ✅ Place the app under `scenario/{project}/src/{ProjectName}.Web/`
 - ✅ Generate industry-specific models, seed data, and Razor pages
-- ✅ Include a `SeedData/` folder with JSON files for sample entities
-- ✅ Use in-memory collections loaded from JSON at startup — no database required
+- ✅ Detect data endpoints in the architecture (Storage Table, SQL, Cosmos DB, etc.)
+- ✅ When a data service exists: use its SDK, connect via managed identity or connection string from app settings, seed sample data on first run
+- ✅ When no data service exists: include a `SeedData/` folder with JSON files and use in-memory collections
 - ✅ Add a `Dockerfile` for container-targeted scenarios (multi-stage build)
 - ✅ Update `azure.yaml` to register the app as a service
 - ✅ Run `dotnet build` to validate the project compiles
@@ -125,7 +129,7 @@ never on VM-only scenarios.
 ### DON'T
 
 - ❌ Generate a webapp for VM-only scenarios
-- ❌ Add external database dependencies (SQL, Cosmos DB, etc.) — use local JSON seed data
+- ❌ Use local JSON when the architecture already includes a data service — always prefer the real backend
 - ❌ Use a framework other than .NET 10 C#
 - ❌ Create overly complex architectures — this is a demo/sample app
 - ❌ Skip `dotnet build` validation
@@ -149,9 +153,20 @@ Before starting, validate these artifacts exist in `scenario/{project}/`:
 ### Phase 1: Context Extraction
 
 1. Read `01-requirements.md` — extract **business industry** and **project description**
-2. Read `02-architecture-assessment.md` — identify **compute target** (App Service, Container Apps, ACI, AKS, or VM)
+2. Read `02-architecture-assessment.md` — identify **compute target** (App Service, Container Apps, ACI, AKS, or VM) and **data endpoints**
 3. If VM-only → SKIP with message and return
 4. Read `04-implementation-plan.md` — note the App Service or container resource names
+5. Classify the **data strategy**:
+
+| Architecture Includes   | Data Strategy           | SDK / NuGet Package                                        |
+| ----------------------- | ----------------------- | ---------------------------------------------------------- |
+| Storage Account (Table) | Azure Table Storage     | `Azure.Data.Tables`                                        |
+| SQL Database            | Azure SQL               | `Microsoft.Data.SqlClient`                                 |
+| Cosmos DB (NoSQL)       | Cosmos DB SDK           | `Microsoft.Azure.Cosmos`                                   |
+| Cosmos DB (Table API)   | Azure Table Storage     | `Azure.Data.Tables`                                        |
+| Redis Cache             | Redis                   | `Microsoft.Extensions.Caching.StackExchangeRedis`          |
+| Event Hub / Service Bus | Event-driven messaging  | `Azure.Messaging.EventHubs` / `Azure.Messaging.ServiceBus` |
+| None of the above       | **Local JSON fallback** | (no extra packages)                                        |
 
 ### Phase 2: Scaffold .NET 10 Web App
 
@@ -167,11 +182,13 @@ Before starting, validate these artifacts exist in `scenario/{project}/`:
 
 ### Phase 3: Generate Industry-Specific Models and Data
 
-Based on the business industry from requirements, generate:
+Based on the business industry from requirements and the data strategy from Phase 1:
 
 1. **Domain Models** in `Models/` — 2-4 entity classes relevant to the industry
-2. **Seed Data** in `SeedData/` — JSON files with 10-20 realistic sample records per entity
-3. **Data Service** in `Services/` — in-memory data service that loads JSON at startup
+2. **Data Service** in `Services/`:
+   - **If data backend detected**: Create a service that reads/writes to the Azure service (e.g., `TableStorageDataService`, `CosmosDataService`, `SqlDataService`). Use connection string or managed identity from `IConfiguration`. Include a seed method that populates the backend with sample data if empty.
+   - **If no data backend**: Create `SampleDataService` that loads local JSON files in-memory.
+3. **Seed Data** in `SeedData/` — JSON files with 10-20 realistic sample records per entity (used for initial seeding of the backend, or as the data source for the fallback)
 4. **Razor Pages** in `Pages/` — list and detail pages for each entity
 
 #### Industry Templates

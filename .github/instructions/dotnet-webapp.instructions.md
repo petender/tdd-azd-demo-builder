@@ -9,7 +9,7 @@ applyTo: "**/*.cs,**/*.csproj,**/Dockerfile"
 
 - **Target framework**: `net10.0` — always use the latest .NET 10
 - **Project type**: ASP.NET Core Razor Pages (`dotnet new webapp`)
-- **No external database**: All data is loaded from local JSON seed files via in-memory services
+- **Data strategy**: Use the Azure data service (Storage Table, SQL, Cosmos DB, etc.) when the architecture includes one. Fall back to local JSON seed files only when no data endpoint is specified.
 
 ## Project Structure
 
@@ -44,8 +44,10 @@ applyTo: "**/*.cs,**/*.csproj,**/Dockerfile"
 
 ### Services
 
-- Register `SampleDataService` as singleton in DI
+- When an Azure data service is present: register the appropriate data service (e.g., `TableStorageDataService`) as singleton
+- When no data endpoint: register `SampleDataService` as singleton
 - Use `System.Text.Json` for deserialization (not Newtonsoft)
+- Use `Azure.Identity` (`DefaultAzureCredential`) for authenticating to Azure services
 - Load seed data lazily on first access
 - Handle missing files gracefully (return empty list)
 
@@ -107,9 +109,11 @@ applyTo: "**/*.cs,**/*.csproj,**/Dockerfile"
 
 ## Anti-Patterns to Avoid
 
-- ❌ Do not use Entity Framework or any ORM
+- ❌ Do not use Entity Framework or any ORM — use native SDKs (`Azure.Data.Tables`, `Microsoft.Azure.Cosmos`, `Microsoft.Data.SqlClient`)
+- ❌ Do not use local JSON seed data when an Azure data service exists in the architecture
 - ❌ Do not add authentication/authorization middleware
 - ❌ Do not use `HttpClient` to fetch external data
 - ❌ Do not add Swagger/OpenAPI (this is a Razor Pages app, not an API)
 - ❌ Do not use `IConfiguration` for seed data paths — use `IWebHostEnvironment.ContentRootPath`
 - ❌ Do not add health check endpoints (keep the app minimal)
+- ❌ Do not store secrets in appsettings.json — use environment variables or managed identity

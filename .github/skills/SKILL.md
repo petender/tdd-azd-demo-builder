@@ -614,6 +614,21 @@ For full details, see `.github/skills/webapp-development/SKILL.md`.
 | Real Estate   | Property, Agent, Listing       |
 | Manufacturing | Product, WorkOrder, Machine    |
 
+### Data Strategy
+
+The webapp's data storage depends on the architecture:
+
+| Architecture Includes           | Data Strategy              | Fallback   |
+| ------------------------------- | -------------------------- | ---------- |
+| Storage Account (Table Storage) | `Azure.Data.Tables` SDK    | —          |
+| SQL Database                    | `Microsoft.Data.SqlClient` | —          |
+| Cosmos DB                       | `Microsoft.Azure.Cosmos`   | —          |
+| Redis Cache                     | Redis caching SDK          | —          |
+| **No data service**             | —                          | Local JSON |
+
+> Use the Azure data service when present; fall back to local JSON only when
+> no data endpoint exists in the architecture.
+
 ### azd Service Wiring
 
 When a sample webapp is generated, `azure.yaml` gains a `services:` block:

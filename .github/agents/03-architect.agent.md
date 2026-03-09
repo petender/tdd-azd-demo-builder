@@ -138,9 +138,16 @@ Key Services:
 
 Architecture Pattern: {brief description}
 Region: {region}
+Data Endpoint: {Storage Table / SQL Database / Cosmos DB / None}
 
 Proceed directly to Bicep Planning after publishing this summary.
 ```
+
+> **Important for downstream agents**: When the architecture includes a data service
+> (Storage Account Table, SQL Database, Cosmos DB, Redis Cache, Event Hub, Service Bus,
+> etc.), explicitly note this in the assessment under a **Data Endpoint** section.
+> The Development agent (Step 4b) uses this to decide whether the sample webapp
+> stores data in the Azure service or falls back to local JSON seed files.
 
 ## Output Files
 
