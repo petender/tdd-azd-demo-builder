@@ -1,7 +1,6 @@
 # Demo Guide - {project-name}
 
-<details open>
-<summary><strong>📑 Demo Guide Contents</strong></summary>
+📑 Demo Guide Contents
 
 use the below markdown example literally as the structure, obviously updating with the scenario specicific content
 

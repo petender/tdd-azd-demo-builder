@@ -1,7 +1,6 @@
 # 📀 Step 4: Implementation Plan - {project-name}
 
-<details open>
-<summary><strong>📑 Implementation Contents</strong></summary>
+📑 Implementation Contents
 
 - [📋 Overview](#-overview)
 - [📦 Resource Inventory](#-resource-inventory)
@@ -12,8 +11,6 @@
 - [🔄 Runtime Flow Diagram](#-runtime-flow-diagram)
 - [🏷️ Naming Conventions](#-naming-conventions)
 - [🔒 Execution Handoff](#-execution-handoff)
-
-</details>
 
 ## 📋 Overview
 
