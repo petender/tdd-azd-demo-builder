@@ -7,7 +7,7 @@
 
 1. Enable subagents: `"github.copilot.chat": { "customAgentInSubagent": { "enabled": true } }`
 2. Open Chat (`Ctrl+Shift+I`) → Select **executionlead** → Describe your project
-3. The executionlead guides you through all 6 steps with automatic handoffs
+3. The executionlead guides you through all 7 steps with automatic handoffs
 
 ## Workflow
 
@@ -17,6 +17,7 @@
 | 2    | Architect    | `02-architecture-assessment.md`                           | Automatic   |
 | 3    | Diagrammer   | `03-des-*.{py,png,md}`                                    | Automatic   |
 | 4    | Bicep        | `04-implementation-plan.md` + `scenario/{project}/infra/` | Automatic   |
+| 4b   | Development  | `07-webapp-summary.md` + `scenario/{project}/src/`        | Conditional |
 | 5    | Deploy       | `06-deployment-summary.md`                                | Automatic   |
 | 6    | DemoGuide    | `08-demo-guide.md`                                        | Automatic   |
 
@@ -27,6 +28,7 @@ All outputs → `scenario/{project}/`. Context flows via artifact files + handof
 | Skill                         | Purpose                                                               |
 | ----------------------------- | --------------------------------------------------------------------- |
 | **`SKILL.md`** (consolidated) | Defaults, AVM, Bicep patterns, diagrams, artifacts, demo guide        |
+| `webapp-development`          | .NET 10 sample webapp scaffolding, industry seed data, azd wiring     |
 | `azure-adr`                   | Architecture Decision Records                                         |
 | `github-operations`           | GitHub issues, PRs, CLI, Actions, releases                            |
 | `git-commit`                  | Commit message conventions                                            |
@@ -66,5 +68,6 @@ Full details in `.github/skills/SKILL.md`.
 | `.github/instructions/`           | File-type rules (Bicep, Markdown, etc.)      |
 | `scenario/{project}/`             | Agent-generated artifacts                    |
 | `scenario/{project}/infra/`       | Bicep templates                              |
+| `scenario/{project}/src/`         | Sample webapp source (when generated)        |
 | `.vscode/mcp.json`                | MCP server configuration                     |
 | `.vscode/infraops.toolsets.jsonc` | Workspace tool groups for interactive chat   |

@@ -22,7 +22,7 @@ between each step.
 
 Guide a project from business description through validated Bicep
 templates using the full agent pipeline: Requirements → Architect →
-Design → Bicep → Deploy → Demo Guide.
+Design → Bicep → Development (conditional) → Deploy → Demo Guide.
 All steps are required to have a successful project and do the handover to the user. After the final handoff, prompt the user to confirm the project run is complete.
 
 ## Scope & Preconditions
@@ -68,6 +68,22 @@ planning, template generation, and validation.
 
 After templates are generated, verify `bicep build` and `bicep lint` pass.
 
+Automatically continue to Step 4b (Development) if user requested a sample webapp, otherwise skip to Step 5 (Deploy).
+
+### Step 4b: Development (Conditional)
+
+If the user requested a sample web application during Step 1:
+
+1. Delegate to **Development** agent with the project name and chosen industry
+2. The agent scaffolds a .NET 10 C# Razor Pages webapp with local seed data
+3. Wires the app into `azure.yaml` as a service
+4. Generates `07-webapp-summary.md`
+
+Skip this step if:
+
+- The user declined a sample webapp
+- The architecture is VM-only (no App Service, Container Apps, ACI, or AKS)
+
 Automatically continue to Step 5 (Deploy).
 
 ### Step 5: Deploy
@@ -99,6 +115,7 @@ scenario/{projectName}/
 ├── 04-preflight-check.md
 ├── 05-implementation-reference.md
 ├── 06-deployment-summary.md
+├── 07-webapp-summary.md          (conditional — if sample webapp requested)
 ├── /demoguide/demoguide.md
 ├── /demoguide/images/*.png
 └── README.md
@@ -107,6 +124,9 @@ scenario/{projectName}/infra/
 ├── main.bicep
 ├── main.bicepparam
 └── modules/
+
+scenario/{projectName}/src/         (conditional — if sample webapp requested)
+└── {ProjectName}.Web/
 ```
 
 ## Quality Assurance

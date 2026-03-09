@@ -25,6 +25,11 @@
   },
   "chat.tools.terminal.autoApprove": {
     "c:/azd-demo-builder-v1/.venv/Scripts/python.exe": true,
-    "ConvertFrom-Json": true
+    "ConvertFrom-Json": true,
+    "ForEach-Object": true,
+    "npm run lint:artifact-templates": true,
+    "bicep": true,
+    "&": true,
+    "Test-Path": true
   }
 }

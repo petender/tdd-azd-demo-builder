@@ -1,6 +1,6 @@
 ---
 name: 01-executionlead
-description: Orchestrates the Azure demo builder workflow end-to-end, coordinating specialized agents (Validation, Architect, Design, Bicep, Deploy, DemoGuide) through a six-step development cycle with automatic handoffs.
+description: Orchestrates the Azure demo builder workflow end-to-end, coordinating specialized agents (Validation, Architect, Design, Bicep, Development, Deploy, DemoGuide) through a seven-step development cycle with automatic handoffs.
 model: "Claude Opus 4.6"
 argument-hint: Provide a scenario description for the Azure infrastructure project you want to build
 user-invokable: true
@@ -10,6 +10,7 @@ agents:
     "03-Architect",
     "04-Diagrammer",
     "05-Bicep",
+    "05b-Development",
     "06-Deploy",
     "07-DemoGuide",
   ]
@@ -123,9 +124,16 @@ Step 1: Requirements    →  01-requirements.md
 Step 2: Architecture    →  02-architecture-assessment.md
 Step 3: Design          →  03-des-*.md/py
 Step 4: Bicep           →  04-implementation-plan.md + scenario/{project}/infra/
+Step 4b: Development    →  07-webapp-summary.md + scenario/{project}/src/ (conditional)
 Step 5: Deploy          →  06-deployment-summary.md
 Step 6: Demo Guide      →  08-demo-guide.md
 ```
+
+> **Step 4b** is conditional. During Step 1, ask the user:
+> _"Would you like to include a sample web application for this workload? If yes, which business industry? (Healthcare, Retail, Finance, Education, Hospitality, Logistics, Real Estate, Manufacturing)"_
+>
+> If the user says yes, store the industry choice and execute Step 4b after Bicep.
+> If the architecture is VM-only, skip Step 4b automatically.
 
 ## Progress Checkpoints
 
@@ -154,6 +162,18 @@ Artifact: scenario/{project}/02-architecture-assessment.md
 Plan: scenario/{project}/04-implementation-plan.md
 Templates: scenario/{project}/infra/
 Reference: scenario/{project}/05-implementation-reference.md
+✅ Next: Development (Step 4b) or Deploy (Step 5)
+➡️ If sample webapp requested: continue to Development (Step 4b)
+➡️ If no webapp requested or VM-only: skip to Deploy (Step 5)
+```
+
+### Checkpoint 3b: After Development (Conditional)
+
+```text
+🧑‍💻 DEVELOPMENT COMPLETE
+Artifact: scenario/{project}/07-webapp-summary.md
+Source: scenario/{project}/src/{ProjectName}.Web/
+azd wiring: scenario/{project}/azure.yaml (services block added)
 ✅ Next: Deploy (Step 5)
 ➡️ Continue automatically to Deploy (Step 5)
 ```
@@ -199,6 +219,7 @@ Use `#runSubagent` for each workflow step:
 | 2    | Architect    | Create architecture assessment for requirements in 01-requirements.md                                                                                                                                                 |
 | 3    | Design       | Generate architecture diagrams and ADRs                                                                                                                                                                               |
 | 4    | Bicep        | Run governance discovery, plan, generate Bicep templates, and validate per 02-architecture-assessment.md                                                                                                              |
+| 4b   | Development  | Scaffold .NET 10 sample webapp with {industry} seed data, wire into azure.yaml, validate build. **Skip if VM-only or user declined.**                                                                                 |
 | 5    | Deploy       | Run what-if analysis, prompt user, deploy to Azure with `azd up`, generate 06-deployment-summary.md. **MUST attempt actual deployment. On failure, report back so executionlead can prompt the user for a decision.** |
 | 6    | DemoGuide    | Generate audience-aware demo runbook from all prior artifacts                                                                                                                                                         |
 
@@ -227,6 +248,8 @@ Use `#runSubagent` for each workflow step:
 | 3    | `03-des-*.md`, `03-des-*.py`    | Exists?          |
 | 4    | `04-implementation-plan.md`     | Exists?          |
 | 4    | `scenario/{project}/infra/`     | Templates valid? |
+| 4b   | `07-webapp-summary.md`          | Conditional      |
+| 4b   | `scenario/{project}/src/`       | Conditional      |
 | 5    | `06-deployment-summary.md`      | Exists?          |
 | 6    | `08-demo-guide.md`              | Required         |
 
@@ -237,5 +260,6 @@ Use `#runSubagent` for each workflow step:
 | Requirements | Opus 4.6                 | Deep understanding |
 | Architect    | Opus 4.6                 | Analysis           |
 | Bicep        | Opus 4.6 / GPT-5.3-Codex | Plan + code gen    |
+| Development  | Opus 4.6                 | .NET code gen      |
 | Deploy       | Opus 4.6                 | Deployment exec    |
 | DemoGuide    | GPT-5.3-Codex            | Documentation gen  |

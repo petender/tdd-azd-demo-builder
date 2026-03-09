@@ -62,11 +62,13 @@ tools:
 
 # Deploy Agent
 
-**Step 5** of the workflow: `requirements → architect → design → bicep → [deploy] → demoguide`
+**Step 5** of the workflow: `requirements → architect → design → bicep → [development] → [deploy] → demoguide`
 
-Deploys validated Bicep templates to Azure using `azd up`. Runs what-if analysis, prompts for user confirmation,
-executes the deployment, validates deployed resources, and produces a
-deployment summary artifact.
+Deploys validated Bicep templates to Azure using `azd up`. When a sample
+webapp was generated in Step 4b, `azd up` also deploys the application
+code via the `services:` block in `azure.yaml`. Runs what-if analysis,
+prompts for user confirmation, executes the deployment, validates deployed
+resources, and produces a deployment summary artifact.
 
 > [!CAUTION]
 > **HARD RULE — DEPLOYMENT MUST ALWAYS BE ATTEMPTED**

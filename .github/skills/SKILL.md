@@ -584,3 +584,46 @@ update date and progress percentage (each step ≈ 14%).
 - Contingency playbook covers top 3 most likely failure scenarios
 - Pre-demo checklist validates all resources the demo touches
 - Talking points match the selected audience persona tone
+
+---
+
+## 7. Webapp Development Patterns
+
+For full details, see `.github/skills/webapp-development/SKILL.md`.
+
+### When to Generate a Sample Webapp
+
+| Compute Target   | Webapp? | Host Type      |
+| ---------------- | ------- | -------------- |
+| App Service      | Yes     | `appservice`   |
+| Container Apps   | Yes     | `containerapp` |
+| ACI              | Yes     | `aci`          |
+| AKS              | Yes     | `aks`          |
+| Virtual Machines | No      | —              |
+
+### Industry Data Models
+
+| Industry      | Entities                       |
+| ------------- | ------------------------------ |
+| Healthcare    | Doctor, Patient, Appointment   |
+| Retail        | Product, Category, Order       |
+| Finance       | Customer, Account, Transaction |
+| Education     | Student, Course, Enrollment    |
+| Hospitality   | Room, Guest, Reservation       |
+| Logistics     | Shipment, Warehouse, Driver    |
+| Real Estate   | Property, Agent, Listing       |
+| Manufacturing | Product, WorkOrder, Machine    |
+
+### azd Service Wiring
+
+When a sample webapp is generated, `azure.yaml` gains a `services:` block:
+
+```yaml
+services:
+  web:
+    project: ./src/{ProjectName}.Web
+    host: { appservice|containerapp|aci|aks }
+    language: csharp
+```
+
+Container targets also require a `docker.path` entry pointing to the Dockerfile.
