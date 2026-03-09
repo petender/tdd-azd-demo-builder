@@ -251,7 +251,8 @@ scenario/{project}/
 ├── 04-implementation-plan.md     ← Written by Bicep agent
 ├── infra/main.bicep              ← Written by Bicep agent
 ├── 06-deployment-summary.md      ← Written by Deploy agent
-└── 08-demo-guide.md              ← Written by DemoGuide agent
+└── demoguide/demoguide.md       ← Written by DemoGuide agent
+└── demoguide/images/*.png*      ← Written by DemoGuide agent
 ```
 
 When an agent starts, it reads the artifacts from previous steps to get context.
@@ -350,7 +351,7 @@ executionlead receives user prompt
     │   └─ Deploy agent reads infra/, runs azd, writes 06-deployment-summary.md
     │
     └─ runSubagent("07-DemoGuide", "Generate demo guide from all artifacts")
-        └─ DemoGuide agent reads all prior artifacts, writes 08-demo-guide.md
+        └─ DemoGuide agent reads all prior artifacts, writes `scenario/{project}/`demoguide/demoguide.md
 ```
 
 Each subagent runs in isolation with its own context window. The only shared

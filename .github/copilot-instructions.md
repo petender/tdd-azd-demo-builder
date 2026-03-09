@@ -19,7 +19,7 @@
 | 4    | Bicep        | `04-implementation-plan.md` + `scenario/{project}/infra/` | Automatic   |
 | 4b   | Development  | `07-webapp-summary.md` + `scenario/{project}/src/`        | Conditional |
 | 5    | Deploy       | `06-deployment-summary.md`                                | Automatic   |
-| 6    | DemoGuide    | `08-demo-guide.md`                                        | Automatic   |
+| 6    | DemoGuide    | `/demoguide/demoguide.md` + `/demoguide/*.png`            | Automatic   |
 
 All outputs → `scenario/{project}/`. Context flows via artifact files + handoffs.
 

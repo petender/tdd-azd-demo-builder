@@ -33,7 +33,7 @@ The workflow is a six-step pipeline. Each step is handled by a dedicated agent t
 | 3    | **Diagrammer**  | Generates Python-based architecture diagrams and ADRs          | `03-architect-diagram.py`, `03-architect-diagram.png` |
 | 4    | **Bicep**       | Runs governance discovery, generates AVM-first Bicep templates | `infra/main.bicep`, `04-implementation-plan.md`       |
 | 5    | **Deploy**      | Runs `azd up` with what-if analysis and validates deployment   | `06-deployment-summary.md`                            |
-| 6    | **DemoGuide**   | Produces an audience-aware demo runbook with talking points    | `08-demo-guide.md`                                    |
+| 6    | **DemoGuide**   | Produces an audience-aware demo runbook with talking points    | `demoguide/demoguide.md.md`                           |
 
 All artifacts land in `scenario/{project}/`, giving you a self-contained, version-controlled demo package.
 
@@ -145,7 +145,7 @@ scenario/                      # Generated demo projects (one folder per scenari
 │   ├── 03-architect-diagram.py
 │   ├── 04-implementation-plan.md
 │   ├── 06-deployment-summary.md
-│   ├── 08-demo-guide.md
+│   ├── /demoguide/demoguide.md
 │   ├── azure.yaml
 │   └── infra/
 │       ├── main.bicep

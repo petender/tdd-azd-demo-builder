@@ -218,15 +218,10 @@ for resource overviews and each demo step.
 
 ### Phase 7: Artifact Generation
 
-Generate `scenario/{project}/08-demo-guide.md` following the H2 structure
+Generate `scenario/{project}/demoguide/demoguide.md` following the H2 structure
 from the azure-artifacts skill exactly.
 Ensure all Playwright-captured screenshots from Phase 6 are embedded
 inline next to their corresponding demo steps.
-
-If the audience format is **Workshop**, also generate:
-
-- `scenario/{project}/08-demo-lab-exercises.md` — hands-on lab instructions
-- `scenario/{project}/08-demo-facilitator-notes.md` — facilitation guide
 
 ### Phase 8: Screenshot File Validation
 
@@ -248,7 +243,7 @@ if ($missing.Count -gt 0) {
 ```
 
 If Playwright was unavailable or declined by the user, require both of these in
-`08-demo-guide.md` before completion:
+`/demoguide/demoguide.md` before completion:
 
 1. Placeholder `<img>` tags with `TODO: capture screenshot` alt text.
 2. A brief note explaining why live screenshots were not captured.
@@ -257,42 +252,12 @@ If Playwright was unavailable or declined by the user, require both of these in
 
 ## Output Files
 
-| File                           | Purpose                         | Required      |
-| ------------------------------ | ------------------------------- | ------------- |
-| `08-demo-guide.md`             | Main demo runbook               | Yes           |
-| `demoguide/images/*.png`       | Playwright-captured screenshots | Yes           |
-| `08-demo-lab-exercises.md`     | Workshop lab instructions       | Workshop only |
-| `08-demo-facilitator-notes.md` | Facilitator guide               | Workshop only |
+| File                      | Purpose                         | Required |
+| ------------------------- | ------------------------------- | -------- |
+| `/demoguide/demoguide.md` | Main demo runbook               | Yes      |
+| `demoguide/images/*.png`  | Playwright-captured screenshots | Yes      |
 
 All files saved to `scenario/{project}/`.
-
----
-
-## Audience Format Reference
-
-### Executive (15 min)
-
-- Focus on business outcomes and ROI
-- Show Portal dashboards, not CLI commands
-- Emphasize cost, security posture, compliance
-- Reference `docs/presenter/executive-pitch.md` for messaging
-- Reference `docs/presenter/roi-calculator.md` for value quantification
-
-### Technical (30 min)
-
-- Deep-dive into architecture and IaC patterns
-- Show Bicep/Terraform templates and AVM module usage
-- Demonstrate CI/CD pipeline and validation steps
-- Include CLI commands for live resource inspection
-- Reference `docs/presenter/visual-elements-guide.md` for diagram usage
-
-### Workshop (60+ min)
-
-- Hands-on labs with participant exercises
-- Progressive complexity (basic → advanced)
-- Include checkpoint questions and expected outcomes
-- Reference `docs/presenter/workshop-checklist.md` for preparation
-- Reference `docs/presenter/character-reference.md` for storytelling
 
 ---
 
@@ -300,7 +265,7 @@ All files saved to `scenario/{project}/`.
 
 Before marking the demo guide complete:
 
-- [ ] All H2 headings match the `08-demo-guide.md` template structure
+- [ ] All H2 headings match the `/demoguide/demoguide.md` template structure
 - [ ] Attribution header present with agent name and date
 - [ ] No placeholder text ("TBD", "Insert here"); allow `TODO: capture screenshot` only in documented Playwright fallback mode
 - [ ] Every demo step has a time estimate
@@ -314,4 +279,4 @@ Before marking the demo guide complete:
 - [ ] If Playwright is unavailable, fallback placeholders include `TODO: capture screenshot` alt text and a brief reason is documented
 - [ ] Required screenshot files exist on disk (or documented fallback mode is present)
 - [ ] Cross-navigation links to adjacent artifacts are correct
-- [ ] File saved to `scenario/{project}/08-demo-guide.md`
+- [ ] File saved to `scenario/{project}/demoguide/demoguide.md`

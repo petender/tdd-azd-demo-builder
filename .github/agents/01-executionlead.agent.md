@@ -126,7 +126,7 @@ Step 3: Design          →  03-architect-*.md/py
 Step 4: Bicep           →  04-implementation-plan.md + scenario/{project}/infra/
 Step 4b: Development    →  07-webapp-summary.md + scenario/{project}/src/ (conditional)
 Step 5: Deploy          →  06-deployment-summary.md
-Step 6: Demo Guide      →  08-demo-guide.md
+Step 6: Demo Guide      →  /demoguide/demoguide.md
 ```
 
 > **Step 4b** is conditional. During Step 1, ask the user:
@@ -236,7 +236,7 @@ Artifact: scenario/{project}/06-deployment-summary.md
 
 ```text
 🎬 DEMO GUIDE COMPLETE
-Artifact: scenario/{project}/08-demo-guide.md
+Artifact: scenario/{project}/demoguide/demoguide.md
 Screenshots: scenario/{project}/demoguide/images/*.png (MANDATORY)
 ✅ Playwright screenshots captured or fallback documented
 ✅ Workflow complete.
@@ -289,7 +289,7 @@ Use `#runSubagent` for each workflow step:
 | 4b   | `07-webapp-summary.md`                     | Conditional                                      |
 | 4b   | `scenario/{project}/src/`                  | Conditional                                      |
 | 5    | `06-deployment-summary.md`                 | Exists?                                          |
-| 6    | `08-demo-guide.md`                         | Required                                         |
+| 6    | `/demoguide/demoguide.md`                  | Required                                         |
 | 6    | `demoguide/images/*.png`                   | **MANDATORY** — screenshots captured or fallback |
 
 ## Model Selection
