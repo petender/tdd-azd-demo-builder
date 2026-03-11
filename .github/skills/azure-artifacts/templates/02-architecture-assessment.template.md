@@ -40,35 +40,9 @@ flowchart TB
 
 ## 📦 Resource SKU Recommendations
 
-| Service   | Recommended SKU | Configuration | Monthly Est. | Justification |
-| --------- | --------------- | ------------- | ------------ | ------------- |
-| {service} | {sku}           | {config}      | ${amount}    | {why}         |
-
-<details>
-<summary><strong>{Service 1}</strong> — Pricing Tier Comparison</summary>
-
-| Tier     | vCPU   | RAM    | Price/mo | Fits?        |
-| -------- | ------ | ------ | -------- | ------------ |
-| Basic    | {spec} | {spec} | ${price} | ❌ / ⚠️ / ✅ |
-| Standard | {spec} | {spec} | ${price} | ❌ / ⚠️ / ✅ |
-| Premium  | {spec} | {spec} | ${price} | ❌ / ⚠️ / ✅ |
-
-**Selected**: {tier} — {justification}
-
-</details>
-
-<details>
-<summary><strong>{Service 2}</strong> — Pricing Tier Comparison</summary>
-
-| Tier     | Capacity | Price/mo | Fits?        |
-| -------- | -------- | -------- | ------------ |
-| Basic    | {spec}   | ${price} | ❌ / ⚠️ / ✅ |
-| Standard | {spec}   | ${price} | ❌ / ⚠️ / ✅ |
-| Premium  | {spec}   | ${price} | ❌ / ⚠️ / ✅ |
-
-**Selected**: {tier} — {justification}
-
-</details>
+| Service   | Recommended SKU | Configuration |
+| --------- | --------------- | ------------- |
+| {service} | {sku}           | {config}      |
 
 ---
 

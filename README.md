@@ -167,7 +167,7 @@ To remove all deployed resources for a scenario:
 
 ```bash
 cd scenario/{project-name}
-azd down
+azd down --force --purge
 ```
 
 ## Understanding the Agent Architecture

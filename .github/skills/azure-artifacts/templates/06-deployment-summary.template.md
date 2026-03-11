@@ -56,4 +56,4 @@ azd down --force --purge
 ```
 
 > [!TIP]
-> Use `azd down` to tear down all deployed resources when the demo is complete.
+> Use `azd down --force --purge` to tear down all deployed resources when the demo is complete.

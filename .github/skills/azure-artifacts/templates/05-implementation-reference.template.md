@@ -77,7 +77,3 @@ var uniqueSuffix = uniqueString(resourceGroup().id)
 {additional-implementation-notes}
 
 ---
-
-_Implementation reference generated from Bicep templates._
-
----
