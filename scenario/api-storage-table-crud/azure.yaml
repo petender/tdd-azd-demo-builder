@@ -1,0 +1,11 @@
+name: tdd-azd-api-storage-table-crud
+metadata:
+  template: tddazd-api-storage-table-crud@1.0.0
+infra:
+  provider: bicep
+  path: ./infra
+services:
+  web:
+    project: ./src/ApiStorageTableCrud.Web
+    host: appservice
+    language: dotnet
