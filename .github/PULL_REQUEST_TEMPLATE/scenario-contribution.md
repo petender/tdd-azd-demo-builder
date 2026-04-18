@@ -19,28 +19,21 @@ labels: new-scenario
 | ------- | --- | ------- |
 |         |     |         |
 
-## Artifact Checklist
+## Artifact Checklist (included in PR)
 
 ### Required
 
-- [ ] `01-requirements.md` — Structured business requirements
-- [ ] `02-architecture-assessment.md` — Service recommendations and trade-offs
 - [ ] `infra/main.bicep` + modules — Bicep templates
 - [ ] `azure.yaml` — Azure Developer CLI project definition (name: `tdd-azd-{project}`)
 - [ ] `README.md` — Quick-start guide for scenario users
 
 ### Recommended
 
-- [ ] `03-architect-diagram.py` + `.png` — Architecture diagram
-- [ ] `03-architect-runtime-diagram.py` + `.png` — Runtime flow diagram
-- [ ] `03-architect-adr.md` — Architecture Decision Records
-- [ ] `04-implementation-plan.md` — Step-by-step deployment plan
-- [ ] `05-implementation-reference.md` — Code patterns and config reference
-- [ ] `06-deployment-summary.md` — Post-deployment validation results
-- [ ] `07-webapp-summary.md` — Sample webapp details (if applicable)
 - [ ] `demoguide/demoguide.md` — Demo runbook with talking points
 - [ ] `demoguide/images/*.png` — Screenshots of deployed resources
-- [ ] `src/` — Sample web application source code (if applicable)
+- [ ] `infra/main.bicepparam` — Bicep parameter file
+
+> **Note:** Other scenario artifacts (requirements, architecture assessment, diagrams, implementation plans, src/) remain in the contributor's fork for reference and are not included in the PR.
 
 ## Deployment Status
 

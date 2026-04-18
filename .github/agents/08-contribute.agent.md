@@ -59,6 +59,7 @@ cross-fork draft PR, and optionally filing a tracking GitHub Issue.
 ### DO
 
 - ✅ Validate all required artifacts exist before touching git
+- ✅ Stage **only** `infra/`, `demoguide/`, `azure.yaml`, and `README.md` — all other scenario files stay in the contributor's fork
 - ✅ Scan for sensitive files (`.azure/`, `.env`, `bin/`, `obj/`, `publish/`, `applogs/`) and **refuse to proceed** if they would be staged
 - ✅ Use `gh repo fork` (idempotent — reuses existing fork) for fork creation
 - ✅ Prefer GitHub MCP tools for PR and Issue creation; fall back to `gh` CLI only when MCP is unavailable
@@ -69,7 +70,8 @@ cross-fork draft PR, and optionally filing a tracking GitHub Issue.
 ### DON'T
 
 - ❌ Commit without completing artifact validation first
-- ❌ Stage files outside `scenario/{project}/` — this is a single-scenario contribution
+- ❌ Stage files outside the four PR-scoped artifact groups (`infra/`, `demoguide/`, `azure.yaml`, `README.md`)
+- ❌ Include requirements, architecture assessments, diagrams, implementation plans, src/, or other working files in the PR
 - ❌ Include deployment state (`.azure/`), build outputs (`bin/`, `obj/`, `publish/`), logs (`applogs/`), archives (`*.zip`), or environment files (`.env`)
 - ❌ Force-push or rewrite history
 - ❌ Create the PR as ready-for-review — always use draft so the contributor can inspect first
@@ -91,23 +93,43 @@ cross-fork draft PR, and optionally filing a tracking GitHub Issue.
 
 Scan `scenario/{PROJECT}/` and report a completeness checklist.
 
-#### Required Artifacts (HARD GATE — all must pass)
+> [!IMPORTANT]
+> **Only four artifacts are committed to the PR** — `infra/`, `demoguide/`,
+> `azure.yaml`, and `README.md`. All other files (requirements, architecture
+> assessment, diagrams, implementation plans, src/, etc.) stay in the
+> contributor's fork for reference but are **not** pushed to upstream.
 
-| Artifact                        | Check                                         |
-| ------------------------------- | --------------------------------------------- |
-| `01-requirements.md`            | File exists and is non-empty                   |
-| `02-architecture-assessment.md` | File exists and is non-empty                   |
-| `infra/main.bicep`              | File exists                                    |
-| `azure.yaml`                    | File exists and contains `name:` field         |
-| `README.md`                     | File exists and is non-empty                   |
+#### Committed Artifacts (HARD GATE — all must pass)
 
-If **any** required artifact is missing, report the failure and **stop**.
+These are the artifacts that will be staged, committed, and included in the PR:
+
+| Artifact          | Check                                  |
+| ----------------- | -------------------------------------- |
+| `infra/main.bicep`| File exists                            |
+| `infra/modules/`  | Directory exists (at least one module) |
+| `azure.yaml`      | File exists and contains `name:` field |
+| `README.md`       | File exists and is non-empty           |
+
+If **any** committed artifact is missing, report the failure and **stop**.
 Do not proceed to Phase 2.
 
-#### Recommended Artifacts (WARN if missing, non-blocking)
+#### Committed Artifacts (RECOMMENDED — warn if missing, non-blocking)
+
+| Artifact                   | Status if Missing |
+| -------------------------- | ----------------- |
+| `demoguide/demoguide.md`   | ⚠️ WARN            |
+| `demoguide/images/*.png`   | ⚠️ WARN            |
+| `infra/main.bicepparam`    | ⚠️ WARN            |
+
+#### Local-Only Artifacts (validated but NOT committed)
+
+These files are checked to confirm the scenario was fully generated, but they
+remain in the contributor's fork and are **not** included in the PR:
 
 | Artifact                                   | Status if Missing |
 | ------------------------------------------ | ----------------- |
+| `01-requirements.md`                       | ⚠️ WARN            |
+| `02-architecture-assessment.md`            | ⚠️ WARN            |
 | `03-architect-diagram.py` + `.png`         | ⚠️ WARN            |
 | `03-architect-runtime-diagram.py` + `.png` | ⚠️ WARN            |
 | `03-architect-adr.md`                      | ⚠️ WARN            |
@@ -115,8 +137,6 @@ Do not proceed to Phase 2.
 | `05-implementation-reference.md`           | ⚠️ WARN            |
 | `06-deployment-summary.md`                 | ⚠️ WARN            |
 | `07-webapp-summary.md`                     | ⚠️ WARN            |
-| `demoguide/demoguide.md`                   | ⚠️ WARN            |
-| `demoguide/images/*.png`                   | ⚠️ WARN            |
 | `src/` directory                           | ⚠️ WARN            |
 
 #### Sensitive Data Scan (HARD GATE)
@@ -141,17 +161,18 @@ patterns. If it does not, **stop and ask the user to update `.gitignore` first**
 📋 ARTIFACT VALIDATION — {PROJECT}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Required:
-  ✅ 01-requirements.md
-  ✅ 02-architecture-assessment.md
-  ✅ infra/main.bicep
+Committed to PR:
+  ✅ infra/main.bicep + modules/
   ✅ azure.yaml
   ✅ README.md
+  ✅ demoguide/demoguide.md
+  ⚠️  demoguide/images/*.png — MISSING (no screenshots captured)
 
-Recommended:
+Local-only (in fork, not in PR):
+  ✅ 01-requirements.md
+  ✅ 02-architecture-assessment.md
   ✅ 03-architect-diagram.py + .png
   ⚠️  06-deployment-summary.md — MISSING (scenario was not deployed)
-  ⚠️  demoguide/images/*.png — MISSING (no screenshots captured)
 
 Sensitive Data:
   ✅ No .azure/, .env, bin/, obj/, publish/, applogs/ detected
@@ -212,24 +233,22 @@ Result: PASS — ready for contribution
 
 ### Phase 3: Stage & Commit
 
-1. **Stage the scenario folder** using force-add to bypass the top-level
-   `scenario/` gitignore rule, then immediately unstage sensitive paths:
+1. **Stage only the PR-scoped artifacts** using force-add to bypass the
+   top-level `scenario/` gitignore rule:
 
    ```bash
    # Force-add is required because .gitignore ignores scenario/ at the root.
-   # This overrides ALL ignore rules, so we must manually exclude sensitive paths next.
-   git add -f scenario/{PROJECT}/
+   # Only stage the four artifact groups that belong in the PR.
+   git add -f scenario/{PROJECT}/infra/
+   git add -f scenario/{PROJECT}/demoguide/
+   git add -f scenario/{PROJECT}/azure.yaml
+   git add -f scenario/{PROJECT}/README.md
    ```
 
-2. **Unstage sensitive paths** that force-add may have included:
+   > All other scenario files (requirements, architecture assessment, diagrams,
+   > implementation plans, src/, etc.) remain in the contributor's fork only.
 
-   ```bash
-   git reset HEAD -- "scenario/{PROJECT}/.azure/" "scenario/{PROJECT}/**/bin/" "scenario/{PROJECT}/**/obj/" "scenario/{PROJECT}/**/publish/" "scenario/{PROJECT}/**/applogs/" "scenario/{PROJECT}/**/*.zip" "scenario/{PROJECT}/**/.env"
-   ```
-
-   Ignore any "did not match" warnings — not every scenario has all of these.
-
-3. **Verify no sensitive files remain staged**:
+2. **Verify no sensitive files are staged**:
 
    ```bash
    git diff --cached --name-only | Select-String -Pattern '\.azure|\.env|/bin/|/obj/|/publish/|applogs|\.zip'
@@ -238,13 +257,13 @@ Result: PASS — ready for contribution
    If any matches are found, **unstage them and warn the user**. Do not commit
    until the staging area is clean.
 
-4. **Extract context for the commit body** by reading:
+3. **Extract context for the commit body** by reading:
    - `scenario/{PROJECT}/02-architecture-assessment.md` — extract the list of Azure services
    - `scenario/{PROJECT}/azure.yaml` — extract the project `name` field
    - Check if `scenario/{PROJECT}/src/` exists (webapp included?)
    - Check if `scenario/{PROJECT}/06-deployment-summary.md` exists (deployed?)
 
-5. **Commit with a conventional message**:
+4. **Commit with a conventional message**:
 
    ```bash
    git commit -m "feat(scenario): add {PROJECT} demo scenario" -m "{commit_body}"
@@ -298,15 +317,13 @@ Result: PASS — ready for contribution
    | ------- | --- | ------- |
    | ...     | ... | ...     |
 
-   ## Artifact Checklist
+   ## Artifact Checklist (included in PR)
 
-   - [x] `01-requirements.md`
-   - [x] `02-architecture-assessment.md`
    - [x] `infra/main.bicep` + modules
    - [x] `azure.yaml`
    - [x] `README.md`
    - [ ] `demoguide/demoguide.md` (if missing, note why)
-   - [ ] `src/` sample webapp (if applicable)
+   - [ ] `demoguide/images/*.png`
 
    ## Deployment Status
 
