@@ -1,3 +1,40 @@
 {
-  "scenarios": []
+  "scenarios": [
+    {
+      "name": "api-storage-table-crud",
+      "repo": "https://github.com/petender/tdd-azd-api-storage-table-crud",
+      "description": "A .NET 10 Web API on Azure App Service performing full CRUD operations against Azure Storage Table with logistics-industry sample data and Swagger UI.",
+      "services": ["App Service", "Storage Account (Table)", "Log Analytics", "Application Insights"],
+      "hasWebapp": true,
+      "contributor": "petender",
+      "date": "2026-03-08"
+    },
+    {
+      "name": "azure-container-scenarios",
+      "repo": "https://github.com/petender/tdd-azd-azure-container-scenarios",
+      "description": "Comparative demo deploying a single Docker container across four Azure container hosting services (ACI, ACA, AKS, App Service) with shared ACR and unified monitoring.",
+      "services": ["Container Registry", "Container Instances", "Container Apps", "Kubernetes Service", "App Service", "Log Analytics", "Application Insights"],
+      "hasWebapp": false,
+      "contributor": "petender",
+      "date": "2025-07-15"
+    },
+    {
+      "name": "sentinel-threat-detection",
+      "repo": "https://github.com/petender/tdd-azd-sentinel-threat-detection",
+      "description": "Microsoft Sentinel SIEM demo with dual signal sources — a vulnerable Windows VM and a .NET 10 Finance webapp — for SOC analyst training and threat detection workflows.",
+      "services": ["Microsoft Sentinel", "Log Analytics", "Virtual Machine", "Virtual Network", "NSG", "Key Vault", "App Service", "Application Insights"],
+      "hasWebapp": true,
+      "contributor": "petender",
+      "date": "2026-03-09"
+    },
+    {
+      "name": "linux-vm-ssh-nsg",
+      "repo": "https://github.com/petender-demo-org/tdd-azd-linux-vm-ssh-nsg",
+      "description": "A single Ubuntu Linux VM with VNet, Subnet, NSG (SSH port 22), Public IP, and Log Analytics for monitoring. Demonstrates Azure IaaS networking with NSG rules.",
+      "services": ["Virtual Machine", "Virtual Network", "NSG", "Public IP", "Log Analytics"],
+      "hasWebapp": false,
+      "contributor": "petender-demo-org",
+      "date": "2026-04-19"
+    }
+  ]
 }
