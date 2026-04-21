@@ -1,3 +1,20 @@
 {
-  "scenarios": []
+  "scenarios": [
+    {
+      "name": "ai-3026-smart-home",
+      "repo": "https://github.com/rob-foulkrod/tdd-azd-ai-3026-smart-home",
+      "description": "Smart home simulator with natural language light control via Azure AI Foundry agent (gpt-4o) with tool calling. .NET 10 Razor Pages web application.",
+      "services": [
+        "AI Services",
+        "AI Hub",
+        "AI Project",
+        "App Service",
+        "Log Analytics",
+        "Application Insights"
+      ],
+      "hasWebapp": true,
+      "contributor": "rob-foulkrod",
+      "date": "2026-04-21"
+    }
+  ]
 }
