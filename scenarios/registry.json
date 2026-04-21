@@ -1,3 +1,14 @@
 {
-  "scenarios": []
+  "scenarios": [
+    {
+      "name": "smart-home-agent",
+      "description": "Azure AI Foundry smart home agent with custom function tools for natural language light control",
+      "repo": "petender-demo-org/smart-home-agent",
+      "industry": "Smart Home / IoT",
+      "services": ["AI Services", "AI Foundry Project", "App Service", "Key Vault", "Log Analytics", "Application Insights"],
+      "tags": ["ai-foundry", "agents", "function-tools", "dotnet", "razor-pages", "ai-3026"],
+      "author": "petender",
+      "date": "2026-04-21"
+    }
+  ]
 }
