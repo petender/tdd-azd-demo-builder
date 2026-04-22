@@ -9,6 +9,16 @@
       "tags": ["ai-foundry", "agents", "function-tools", "dotnet", "razor-pages", "ai-3026"],
       "author": "petender",
       "date": "2026-04-21"
+    },
+    {
+      "name": "foundry-agentic-agent",
+      "description": "Azure AI Foundry Standard Agent Setup with GPT-4.1-mini, customer-managed Cosmos DB, Storage, and AI Search, plus a Python agentic agent demo",
+      "repo": "petender-demo-org/tdd-azd-foundry-agentic-agent",
+      "industry": "Technology / AI",
+      "services": ["AI Services", "AI Foundry Project", "Cosmos DB", "Storage Account", "AI Search", "Log Analytics", "Application Insights"],
+      "tags": ["ai-foundry", "agents", "python", "cosmos-db", "ai-search", "managed-identity"],
+      "author": "petender",
+      "date": "2026-04-21"
     }
   ]
 }
