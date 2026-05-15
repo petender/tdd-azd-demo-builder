@@ -58,6 +58,33 @@
       "costWarning": "~$50-80/month (serverless Cosmos + B1 App Service) — tear down after demo",
       "hasWebapp": true,
       "industry": "Hospitality"
+    },
+    {
+      "name": "tdd-azd-linux-vm-cosmosdb",
+      "title": "Linux VM + Cosmos DB — Logistics Demo",
+      "description": "Ubuntu Linux VM connected to Azure Cosmos DB NoSQL (Serverless) with a .NET 10 logistics web application for shipment tracking, fleet management, and route optimization.",
+      "repository": "https://github.com/petender-demo-org/tdd-azd-linux-vm-cosmosdb",
+      "tags": [
+        "virtual-machine",
+        "cosmos-db",
+        "linux",
+        "managed-identity",
+        "logistics",
+        "dotnet"
+      ],
+      "author": "petender",
+      "dateAdded": "2026-05-15",
+      "azureServices": [
+        "Virtual Machine (Standard_B2s Ubuntu 24.04)",
+        "Cosmos DB (Serverless NoSQL)",
+        "Virtual Network",
+        "NSG",
+        "Log Analytics"
+      ],
+      "deployTime": "~5 minutes",
+      "costWarning": "~$50-80/month (B2s VM + serverless Cosmos) — tear down after demo",
+      "hasWebapp": true,
+      "industry": "Logistics"
     }
   ]
 }
