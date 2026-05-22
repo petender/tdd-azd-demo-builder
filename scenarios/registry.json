@@ -15,6 +15,7 @@
       ],
       "author": "petender",
       "dateAdded": "2026-05-04",
+      "dateValidated": "2026-05-22",
       "azureServices": [
         "AKS",
         "APIM",
@@ -26,7 +27,9 @@
         "VNet"
       ],
       "deployTime": "~35 minutes",
-      "costWarning": "~$800-900/month — tear down after demo"
+      "costWarning": "~$800-900/month — tear down after demo",
+      "hasWebapp": true,
+      "industry": "Technology / AI / Enterprise Security"
     },
     {
       "name": "tdd-azd-ai-language-services",
